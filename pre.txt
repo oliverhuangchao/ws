@@ -1,0 +1,20 @@
+At first, I will talk about how to build index files.
+A complete index file is important for information retrieval.
+It will let us focus on the algorithm itself.
+In creating our index files, we chain link or cahin 4 map reduce jods.
+The 1st map reduce output will be used as the input of the second output mapreduce and so on.
+There is just one Driver to control the whole process.
+Besides, in second map reduce job, there are two index file output.
+At last, we create a final index, not only it can be used for the bm25 algorithm, but also it can be used for cosin similarity computing in our second project.
+
+In computing the score of each document, we also link 4 map reduce job.
+In first job, we find the relevant document using the term-document index.
+Then we select proper arguments and use this formular to compute the score of each document.
+After that, we use the tree map data structure to rank the top 10 result in map process and reduce process.
+We use the socre as the key , the value is docId and score, then we can find top 10 inputs in each map.
+The tree map is very like a container, has a capcity, for example 10, when size is greater than the capacity, the smallest will be removed.  namely, the size will always equal to the capacity.
+
+In considering the the impact of tf on the score, we draw a picture to show the relationships.
+When tf is large enough, in probability method, the tf has limit impact on the score, because, it reaches its  tf saturation. Therefore we can control the impact of tf to the score. 
+
+From the formular, we can find that when tf is large enough,,, the limit of the term will become  k_1 + 1.

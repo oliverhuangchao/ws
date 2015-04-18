@@ -417,7 +417,7 @@ def search(request):
             [Q(keyword__contains=queryword) for queryword in queryArray])).values_list('path',flat=True)
         audios = Media.objects.filter(Q(type='audio'), reduce(lambda x, y: x | y, 
             [Q(keyword__contains=queryword) for queryword in queryArray])).values_list('path',flat=True)
-        return render_to_response('allMediaBrowser.html', {'images':images,'videos': videos, 'audios':audios})
+        return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'),'images':images,'videos': videos, 'audios':audios})
     else:
-        return render(request, 'searchResultBrowser.html', {'type':mediaType, 'medias':medias})
+        return render(request, 'searchResultBrowser.html', {'username':request.session.get('username'),'type':mediaType, 'medias':medias})
 
