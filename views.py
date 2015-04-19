@@ -305,6 +305,8 @@ def test(request):
 # if list out of range, the path / image is not right , lack of '/', or extra '/'
 def mediaClick(request):
     media=''
+    ifEdit = False
+    comments = ''
     if request.method == 'POST':
         if  request.POST.get('image', ''):
             media = request.POST['image']
@@ -321,25 +323,13 @@ def mediaClick(request):
     mediaType = Media.objects.filter(path=media).values_list('type',flat=True)[0]
 
     media = '/' + media
-    
-    #return render_to_response('test.html',{'mediaType':request.session.get('medias')})
-    ifEdit = False
-    comments = ''
-    
     medias = request.session.get(mediaType)  # it is mediaType
-
     if request.session.get('mediaType') == 'personal':   
         ifEdit = True
-    
-    # # When logging in
-    # if 'username' in request.session:
-    #     medias = Media.objects.filter(username=request.session.get('username'), type=mediaType).values_list('path',flat=True)
-    # else:
-    #     medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
-    
     #it does not matter whether request.session.get('username') exist.
     return render_to_response('singleMediaBrowser.html',{'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
             'meta':meta, 'keyword':keyword,'media': media, 'medias':medias})
+
 import os 
             
 def mediaDelete(request):
@@ -477,7 +467,7 @@ def search(request):
         # request.session['medias'] = medias
         request.session[mediaType]= medias
         return render(request, 'searchResultBrowser.html', {'username':request.session.get('username'),'type':mediaType, 'medias':medias})
-
+import time
 def comment(request):
     commentContent = ''
     score = 0.0
@@ -492,13 +482,15 @@ def comment(request):
             path = path[1:]
         if  request.POST.get('commentContent', ''):
             content = request.POST['commentContent']
-            content = content + '\nBy user ' + request.session.get('username')
-            t = Comment(mediaPath = path, content = content)
+            username = request.session.get('username')
+            commentTime = time.asctime( time.localtime(time.time()) )
+            content = content + '\nBy user ' + username + ' at ' + commentTime
+            t = Comment(mediaPath = path, content = content, commentUser=username)
             t.save()
     t = Media.objects.get(path=path)
     t.score = t.score + float(score)
     t.save()
-    comments = Comment.objects.filter(mediaPath = path).values_list('content',flat=True)
+    comments = Comment.objects.filter(mediaPath = path).values_list('content',flat=True).order_by('-commentTime')
     mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
     # must have '/'
     path = '/' + path

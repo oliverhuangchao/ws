@@ -39,6 +39,7 @@ class Comment(models.Model):
 	username = models.CharField(max_length=50,null=True)
 	content = models.CharField(max_length=250,null=True)
 	commentTime = models.DateTimeField(auto_now_add=True, blank=True)
+	commentUser = models.CharField(max_length=50,null=True)
 class Download(models.Model):
 	IP 			 = models.IPAddressField(null=True)
 	downloadTime = models.DateTimeField(auto_now_add=True,null=True)

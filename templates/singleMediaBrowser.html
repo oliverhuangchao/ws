@@ -92,6 +92,13 @@
     </div>
 
     {% else %}
+    
+      {% if not ifEdit %}
+      <div class="col-md-4 col-md-offset-4">
+        {{keyword}}
+      </div>
+      {% endif%}
+
     <!-- plus from-group here to spacing -->
     <div class ="row col-md-6 col-md-offset-5 form-group">
       <a href="/returnToMain/">
