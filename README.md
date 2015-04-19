@@ -43,7 +43,8 @@ like views, models......
  DROP TABLE wei6_dghp.media;   
                     
  DROP TABLE wei6_dghp.modelView_account;          
- DROP TABLE wei6_dghp.modelView_download;         
+ DROP TABLE wei6_dghp.modelView_download; 
+ DROP TABLE wei6_dghp.modelView_comment;      
  DROP TABLE wei6_dghp.modelView_media;
 
 -strict experimental !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

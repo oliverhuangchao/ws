@@ -219,7 +219,6 @@ def loginCheck(request):
 def upload(request): 
      return render(request, 'upload.html',{'username': request.session.get('username')})
 
-from modelView.models import Media
 from forms import mediaForm
 from django.template import RequestContext
 import datetime
@@ -325,34 +324,26 @@ def mediaClick(request):
 
     media = '/' + media
     
-    if 'username' in request.session:
-        #return render_to_response('test.html',{'mediaType':request.session.get('medias')})
+    #return render_to_response('test.html',{'mediaType':request.session.get('medias')})
+    ifEdit = False
+    comments = ''
+    
+    medias = request.session[mediaType]  # it is mediaType
 
-        if 'mediaTypeSession' in request.session and request.session.get('mediaTypeSession'):
-            mediaTypeSession = request.session.get('mediaType')
-            medias = request.session[mediaType]  # it is mediaType
-            request.session['mediaTypeSession'] = ''
-            # request.session['images'] = ''
-            # request.session['videos'] = ''
-            # request.session['audios'] = ''
-        else:
-            medias = Media.objects.filter(username=request.session.get('username'), type=mediaType).values_list('path',flat=True)
-
-        return render_to_response('singleMediaBrowser.html',{'type':mediaType, 'username':request.session.get('username'),
+    if request.session.get('mediaType') == 'personal':   
+        ifEdit = True
+    
+    # # When logging in
+    # if 'username' in request.session:
+    #     medias = Media.objects.filter(username=request.session.get('username'), type=mediaType).values_list('path',flat=True)
+    # else:
+    #     medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
+    
+    #it does not matter whether request.session.get('username') exist.
+    return render_to_response('singleMediaBrowser.html',{'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
             'meta':meta, 'keyword':keyword,'media': media, 'medias':medias})
-    else: # all corresponding iamges
-        if 'mediaTypeSession' in request.session and request.session.get('mediaTypeSession'):
-            mediaTypeSession = request.session.get('mediaType')
-            medias = request.session[mediaType]  # it is mediaType
-            request.session['mediaTypeSession'] = ''
-            # request.session['images'] = ''
-            # request.session['videos'] = ''
-            # request.session['audios'] = ''
-        else:
-            medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
-        return render_to_response('singleMediaBrowser.html',{'type':mediaType, 'meta':meta, 'keyword':keyword,'media':media, 'medias':medias})
-import os
-
+import os 
+            
 def mediaDelete(request):
     media=''
     # needed, otherwise, image is local
@@ -377,40 +368,83 @@ def mediaDelete(request):
     return render_to_response('singleMediaBrowser.html', {'type': mediaType,'username':request.session.get('username'), 'medias':medias, 'delete':delete})
 
 def allMediaBrowser(request):
+    request.session['mediaType'] = 'all'
+    images = Media.objects.filter(type="image").values_list('path',flat=True)
+    videos = Media.objects.filter(type="video").values_list('path',flat=True)
+    audios = Media.objects.filter(type="audio").values_list('path',flat=True)
+    request.session['image'] = images #type is single
+    request.session['video'] = videos
+    request.session['audio'] = audios
+    return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'images':images, 'videos': videos, 'audios':audios})
+   
+def allMediaBrowserPersonal(request):
+    request.session['mediaType'] = 'personal'
     if 'username' in request.session:
         images = Media.objects.filter(username=request.session.get('username'),type="image").values_list('path',flat=True)
         videos = Media.objects.filter(username=request.session.get('username'),type="video").values_list('path',flat=True)
         audios = Media.objects.filter(username=request.session.get('username'),type="audio").values_list('path',flat=True)
-
+        request.session['image'] = images #type is single
+        request.session['video'] = videos
+        request.session['audio'] = audios
         return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'images':images, 'videos': videos, 'audios':audios})
     else:
         images = Media.objects.filter(type="image").values_list('path',flat=True)
         videos = Media.objects.filter(type="video").values_list('path',flat=True)
         audios = Media.objects.filter(type="audio").values_list('path',flat=True)
-
+        request.session['image'] = images #type is single
+        request.session['video'] = videos
+        request.session['audio'] = audios
         return render_to_response('allMediaBrowser.html', {'images':images,'videos': videos, 'audios':audios})
-
 def imageBrowser(request):
+    request.session['mediaType'] = 'all'
+    images = Media.objects.filter(type="image").values_list('path',flat=True)
+    request.session['image'] = images #type is single
+
+    return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'images':images})
+
+def imageBrowserPersonal(request):
+    request.session['mediaType'] = 'personal'
     if 'username' in request.session:
         images = Media.objects.filter(username=request.session.get('username'),type="image").values_list('path',flat=True)
+        request.session['image'] = images #type is single
         return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'images':images})
     else:
         images = Media.objects.filter(type="image").values_list('path',flat=True)
+        request.session['image'] = images #type is single
         return render_to_response('allMediaBrowser.html', {'images':images})
 
 def videoBrowser(request):
+    request.session['mediaType'] = 'all'
+    videos = Media.objects.filter(type="video").values_list('path',flat=True)
+    request.session['video'] = videos
+    return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'videos':videos})
+
+def videoBrowserPersonal(request):
+    request.session['mediaType'] = 'personal'
     if 'username' in request.session:
         videos = Media.objects.filter(username=request.session.get('username'),type="video").values_list('path',flat=True)
+        request.session['video'] = videos  
         return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'videos':videos})
     else:
         videos = Media.objects.filter(type="video").values_list('path',flat=True)
+        request.session['video'] = videos
         return render_to_response('allMediaBrowser.html', {'videos':videos})
+
 def audioBrowser(request):
+    request.session['mediaType'] = 'all'
+    audios = Media.objects.filter(type="audio").values_list('path',flat=True)
+    request.session['audio'] = audios
+    return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'audios':audios})
+
+def audioBrowserPersonal(request):
+    request.session['mediaType'] = 'personal'
     if 'username' in request.session:
         audios = Media.objects.filter(username=request.session.get('username'),type="audio").values_list('path',flat=True)
+        request.session['audio'] = audios
         return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'audios':audios})
     else:
         audios = Media.objects.filter(type="audio").values_list('path',flat=True)
+        request.session['audio'] = audios
         return render_to_response('allMediaBrowser.html', {'audios':audios})
 
 from django.db.models import Q
@@ -426,7 +460,7 @@ def search(request):
         if  request.POST.get('mediaType', ''):
             mediaType = request.POST['mediaType']
     
-    request.session['mediaTypeSession'] = mediaType
+    request.session['mediaType'] = 'search'
     queryArray = query.split() 
     #use another template here
     if mediaType =='allMedia':
@@ -446,3 +480,39 @@ def search(request):
         request.session[mediaType]= medias
         return render(request, 'searchResultBrowser.html', {'username':request.session.get('username'),'type':mediaType, 'medias':medias})
 
+def comment(request):
+    commentContent = ''
+    score = 0.0
+    path=''
+    if request.method == 'POST':
+        if  request.POST.get('commentContent', ''):
+            commentContent = request.POST['commentContent']
+        if  request.POST.get('score', ''):
+            score = request.POST['score']
+        if  request.POST.get('path', ''):
+            path = request.POST['path']
+            path = path[1:]
+
+    allComments = allComments.objects.filter(mediaPath=path).values_list('content',flat=True)
+
+    mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
+    # must have '/'
+    path = '/' + path
+    if mediaType == 'image':
+        #use medias here
+        medias = Media.objects.filter(type='image').values_list('path',flat=True)
+        return render_to_response('singleMediaBrowser.html',{'type':mediaType,'username':request.session.get('username'),
+            'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
+    elif mediaType == 'video':
+        medias = Media.objects.filter(type='video').values_list('path',flat=True)
+        return render_to_response('singleMediaBrowser.html',{'type':mediaType,'username':request.session.get('username'),
+            'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
+    elif mediaType == 'audio':
+        medias = Media.objects.filter(type='audio').values_list('path',flat=True)
+        return render_to_response('singleMediaBrowser.html',{'type':mediaType,'username':request.session.get('username'),
+            'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
+    else:
+        pass
+
+    return render_to_response('singleMediaBrowser.html',{'type':mediaType, 'username':request.session.get('username'),
+            'meta':meta, 'keyword':keyword,'media': media, 'medias':medias})

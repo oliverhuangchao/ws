@@ -1,3 +1,7 @@
-use media and in session
-media type is decided by clicking
-Care: the mediaType include "all"
+transfer images,videos and audios by session, in 3 places, the values will be changed,
+1. search
+2. all medias browser
+3. personal medias browser.
+4. search has nothing to do with username.
+
+Var ifEdit decide edit or just browser.  

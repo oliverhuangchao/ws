@@ -28,11 +28,16 @@ class Media(models.Model):
 	uploadTime  = models.DateTimeField(auto_now_add=True, blank=True)
 	meta 		= models.CharField(max_length=200,null=True)
 	keyword 	= models.CharField(max_length=200,null=True)
-
+	score		= models.FloatField(default=0.0,null=True)
 	def __str__(self):
-		return 'name:%s type:%s' % (self.path, self.type)	
+		return 'name:%s type:%s' % (self.path, self.filename)	
 	class Admin:
 		pass
+class Comment(models.Model):
+	#path
+	mediaPath =  models.CharField(max_length=200,null=True)
+	username = models.CharField(max_length=50,null=True)
+	content = models.CharField(max_length=250,null=True)
 
 class Download(models.Model):
 	IP 			 = models.IPAddressField(null=True)

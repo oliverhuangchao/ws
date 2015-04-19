@@ -41,9 +41,9 @@
 
             <form class="navbar-form" action="/search/" method="post">
 
-              <div class="col-md-2 col-md-offset-1">
+              <div class="col-md-3">
                 <select data-live-search="true" class="btn-primary form-control input-small"   name ="mediaType">
-                  <option value="allMedia">All</option>
+                  <option value="allMedia">Search All</option>
                   <option value="video">Video</option>
                   <option value="image">image</option>
                   <option value="audio">Audio</option>
@@ -59,11 +59,25 @@
             </form>
           </div>
 
-          <div class="col-md-1 col-md-offset-1">
+          <div class="col-md-1">
 
             <form class="navbar-form navbar-right" role="search">
               <div class="input-group"><a href="/upload/" class="btn btn-warning">Upload</a></div>
             </form>
+          </div>
+
+          <div class="navbar-form btn-group col-md-2" style="margin-right:10px;">
+                  <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">My media <span class="caret"></span></a>
+                    <ol class="dropdown-menu">
+                      <li class="divider"></li>
+                      <li><a href="/allMediaBrowserPersonal/">AllMedia</a></li>
+                      <li class="divider"></li>
+                      <li><a href="/imageBrowserPersonal/">Image</a></li>
+                      <li class="divider"></li>
+                      <li><a href="/videoBrowserPersonal/">Video</a></li>
+                      <li class="divider"></li>
+                      <li><a href="/audioBrowserPersonal/">Audio</a></li>
+                    </ol>   
           </div>
 
           {% if username %}

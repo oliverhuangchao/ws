@@ -46,7 +46,14 @@ urlpatterns = patterns('',
     (r'^videoBrowser/$', videoBrowser),
     (r'^audioBrowser/$', audioBrowser),
 
+    (r'^allMediaBrowserPersonal/$', allMediaBrowserPersonal),
+    (r'^imageBrowserPersonal/$', imageBrowserPersonal),
+    (r'^videoBrowserPersonal/$', videoBrowserPersonal),
+    (r'^audioBrowserPersonal/$', audioBrowserPersonal),
+
     (r'^metaUpdate/$', metaUpdate),
+    
+    (r'^comment/$', comment),
 
 
 )
