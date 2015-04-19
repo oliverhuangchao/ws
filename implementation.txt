@@ -1,0 +1,3 @@
+use media and in session
+media type is decided by clicking
+Care: the mediaType include "all"
