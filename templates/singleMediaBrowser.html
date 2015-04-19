@@ -23,6 +23,9 @@
     <div class="col-md-4 col-md-offset-4">
       score:{{aveScore}}
     </div>
+    <div class="col-md-4 col-md-offset-4">
+      viewers:{{numOfViewer}}
+    </div>
     {% if username and ifEdit%}
     <form class="form-imageDelete col-md-8 col-md-offset-4" action="/mediaDelete/" method="post"> 
         <input type="hidden" name="image" value={{media}}><br>
@@ -51,6 +54,9 @@
     <div class="col-md-4 col-md-offset-4">
       score:{{aveScore}}
     </div>
+    <div class="col-md-4 col-md-offset-4">
+      viewers:{{numOfViewer}}
+    </div>
 
     {% if username and ifEdit%}
     <form class="form-videoDelete col-md-8 col-md-offset-4" action="/mediaDelete/" method="post"> 
@@ -78,7 +84,9 @@
     <div class="col-md-4 col-md-offset-4">
       score:{{aveScore}}
     </div>
-    
+    <div class="col-md-4 col-md-offset-4">
+      viewers:{{numOfViewer}}
+    </div>
     {% if username and ifEdit%}
 
     <div class="row col-md-offset-5"> 

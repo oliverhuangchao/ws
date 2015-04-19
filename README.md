@@ -21,32 +21,23 @@ Care:
 
 many files or functions have postfix 's'
 like views, models......
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+to see the update results,
 
- DROP TABLE wei6_dghp.auth_group;                 
- DROP TABLE wei6_dghp.auth_group_permissions;     
- DROP TABLE wei6_dghp.auth_message;               
- DROP TABLE wei6_dghp.auth_permission;            
- DROP TABLE wei6_dghp.auth_user;                 
- DROP TABLE wei6_dghp.auth_user_groups;           
- DROP TABLE wei6_dghp.auth_user_user_permissions; 
- DROP TABLE wei6_dghp.django_admin_log;           
- DROP TABLE wei6_dghp.django_content_type;        
- DROP TABLE wei6_dghp.django_session;             
- DROP TABLE wei6_dghp.django_site;               
- DROP TABLE wei6_dghp.login_comment;              
- DROP TABLE wei6_dghp.login_post; 
- DROP TABLE wei6_dghp.media;   
+  
                     
  DROP TABLE wei6_dghp.modelView_account;          
  DROP TABLE wei6_dghp.modelView_download; 
  DROP TABLE wei6_dghp.modelView_comment;      
  DROP TABLE wei6_dghp.modelView_media;
  DROP TABLE wei6_dghp.modelView_score;
+
+delete from modelView_score where 1;
+delete from modelView_comment where 1;
+delete from modelView_media where 1;
+
+
+
 
 -strict experimental !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 format transforming

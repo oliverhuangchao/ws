@@ -133,13 +133,15 @@ def metaUpdate(request):
     keyword =  Media.objects.filter(path=path).values_list('keyword',flat=True)[0]
     #"values" get method can alse be used
     mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
+    numOfViewer = Media.objects.filter(path=path).values_list('numOfViewer',flat=True)[0]
+
     # must have '/'
     path = '/' + path
         #use medias here
     ifEdit = True
     medias = request.session.get(mediaType)  # it is mediaType
 
-    return render_to_response('singleMediaBrowser.html',{'aveScore':aveScore,'ifEdit':ifEdit,'type':mediaType,'username':request.session.get('username'),
+    return render_to_response('singleMediaBrowser.html',{'numOfViewer':numOfViewer,'aveScore':aveScore,'ifEdit':ifEdit,'type':mediaType,'username':request.session.get('username'),
         'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
 
 
@@ -307,6 +309,7 @@ def mediaClick(request):
     media=''
     ifEdit = False
     comments = ''
+    numOfViewer = 0
     if request.method == 'POST':
         if  request.POST.get('image', ''):
             media = request.POST['image']
@@ -318,17 +321,30 @@ def mediaClick(request):
             pass
     media = media[1:]
     #path can decide image uniquely
+    owner = Media.objects.filter(path=media).values_list('username',flat=True)[0]
     aveScore =  Media.objects.filter(path=media).values_list('aveScore',flat=True)[0]
     meta =  Media.objects.filter(path=media).values_list('meta',flat=True)[0]
     keyword =  Media.objects.filter(path=media).values_list('keyword',flat=True)[0]
     mediaType = Media.objects.filter(path=media).values_list('type',flat=True)[0]
     comments = Comment.objects.filter(mediaPath = media).values_list('content',flat=True).order_by('-commentTime')
-    media = '/' + media
-    medias = request.session.get(mediaType)  # it is mediaType
+    
+    #prevent scoring by user himself
+    if request.session.get('username') == owner:
+        ifEdit = True
+    else: 
+        #can not use filter since no attribute in Queryset, should include it in models
+        t = Media.objects.get(path=media)
+        t.numOfViewer = t.numOfViewer + 1
+        t.save()
     if request.session.get('mediaType') == 'personal':   
         ifEdit = True
+
+    numOfViewer = Media.objects.filter(path=media).values_list('numOfViewer',flat=True)[0]
+
+    media = '/' + media
+    medias = request.session.get(mediaType)  # it is mediaType
     #it does not matter whether request.session.get('username') exist.
-    return render_to_response('singleMediaBrowser.html',{'aveScore':aveScore,'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
+    return render_to_response('singleMediaBrowser.html',{'numOfViewer':numOfViewer,'aveScore':aveScore,'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
             'meta':meta, 'keyword':keyword,'media': media, 'medias':medias})
 
 import os 
@@ -351,6 +367,7 @@ def mediaDelete(request):
 
     Media.objects.filter(path=media).delete()
     Comment.objects.filter(mediaPath=media).delete()
+    Score.objects.filter(mediaPath=media).delete()
 
     os.remove(media)
 
@@ -479,19 +496,24 @@ def comment(request):
     score = 0.0
     path=''
     update = False
+    aveScore = 0
+    owner = ''
     if request.method == 'POST':
         if  request.POST.get('path', ''):
             path = request.POST['path']
             path = path[1:]
+            owner = Media.objects.filter(path=path).values_list('username',flat=True)[0]
         if  request.POST.get('score', ''):
             score = request.POST['score']
             username = request.session.get('username')
+            print username
             scoreTime = time.asctime( time.localtime(time.time()) )
-            t = Score(mediaPath = path, score = score, scoreUser=username)
+            t = Score(mediaPath = path, score = score, scoreUser=username,username = owner)
             t.save()
             t = Media.objects.get(path=path)
             #can not use objects.get() for Score since multiple result can produce
             t.aveScore = Score.objects.filter(mediaPath = path).aggregate(Avg('score')).values()[0]
+            aveScore = t.aveScore
             t.save()
             print t.aveScore
         if  request.POST.get('commentContent', ''):
@@ -506,10 +528,12 @@ def comment(request):
     t.save()
     comments = Comment.objects.filter(mediaPath = path).values_list('content',flat=True).order_by('-commentTime')
     mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
+    numOfViewer = Media.objects.filter(path=path).values_list('numOfViewer',flat=True)[0]
+
     # must have '/'
     path = '/' + path
     
     medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
-    return render_to_response('singleMediaBrowser.html',{'type':mediaType,'username':request.session.get('username'),
+    return render_to_response('singleMediaBrowser.html',{'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
         'comments':comments,'media': path, 'medias':medias})
 

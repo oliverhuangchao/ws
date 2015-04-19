@@ -8,3 +8,7 @@ Var ifEdit decide edit or just browser.
 
 Not only image clicking can jump to singleMediaBrowser
 But also metaUpdate can do that.
+
+User can not comment and score his media, he can edit his own when searching result including his.
+
+By deciding if owner and browser is the same person, we use diffenrent showing and dealing page.

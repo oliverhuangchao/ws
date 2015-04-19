@@ -45,6 +45,7 @@ class Comment(models.Model):
 class Score(models.Model):
 	#path
 	mediaPath =  models.CharField(max_length=200,null=True)
+	#owner
 	username  = models.CharField(max_length=50,null=True)
 	score	  = models.FloatField(default=0.0,null=True)
 	scoreTime = models.DateTimeField(auto_now_add=True, blank=True)
