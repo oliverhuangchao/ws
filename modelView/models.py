@@ -38,15 +38,12 @@ class Comment(models.Model):
 	mediaPath =  models.CharField(max_length=200,null=True)
 	username = models.CharField(max_length=50,null=True)
 	content = models.CharField(max_length=250,null=True)
-
+	commentTime = models.DateTimeField(auto_now_add=True, blank=True)
 class Download(models.Model):
 	IP 			 = models.IPAddressField(null=True)
-	downloadTime = models.DateTimeField(null=True)
-	# account 	 = models.ForeignKey(Account)
+	downloadTime = models.DateTimeField(auto_now_add=True,null=True)
 	username     = models.CharField(max_length=50,null=True)
-	#may need change media to path of Media
-	media 		 = models.ForeignKey(Media)
-	
+	path = models.CharField(max_length=200,null=True)
 	def __str__(self):
 		return self.IP
 	class Admin:

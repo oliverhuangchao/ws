@@ -30,7 +30,6 @@ urlpatterns = patterns('',
     (r'^upload/$', upload),
     (r'^uploadProcess/$', uploadProcess),
 
-    (r'^returnToUserMain/$', returnToUserMain),
     (r'^returnToMain/$', returnToMain),
 
     (r'^test/$', test),

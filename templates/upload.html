@@ -2,7 +2,7 @@
 
 {% block content %}
 
-  {% if username %}
+<!--  username check can be omitted since upload button not showed when logging -->  
   <form  action="/uploadProcess/" method="post" enctype="multipart/form-data">
     <input type="file" id="theFileInput" name="theFileInput" multiple style="display:none;">
 
@@ -35,7 +35,7 @@
   </form>
 
   <div class ="row col-md-4 col-md-offset-4">
-    <a href="/returnToUserMain/">
+    <a href="/returnToMain/">
       <button class="btn btn-warning start">
             <i class="glyphicon glyphicon-step-backward"></i>
         <span>Return To Main</span>
@@ -85,6 +85,4 @@
     }
   </script>
   
-  {% endif %}
-
 {% endblock %}

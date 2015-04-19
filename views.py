@@ -12,6 +12,11 @@ def login(request):
 def logout(request):
     try:
         del request.session['username']
+        del request.session['mediaType']
+        del request.session['image']
+        del request.session['video']
+        del request.session['audio']
+
     except KeyError:
         pass
     return render_to_response('base.html')
@@ -27,19 +32,17 @@ from forms import accountForm
 from django.http import HttpResponseRedirect
 from modelView.models import *
 
-def returnToUserMain(request):
-    username = request.session.get('username')
-    images = Media.objects.filter(username=username, type="image").values_list('path',flat=True)
-    videos = Media.objects.filter(username=username, type="video").values_list('path',flat=True)
-    audios = Media.objects.filter(username=username, type="audio").values_list('path',flat=True)
-
-    return render(request, 'allMediaBrowser.html', {'username': username, 'images': images, 'videos': videos, 'audios': audios})
-
 def returnToMain(request):
-    images = Media.objects.filter(type="image").values_list('path',flat=True)
-    videos = Media.objects.filter(type="video").values_list('path',flat=True)
-    audios = Media.objects.filter(type="audio").values_list('path',flat=True)
-    return render(request, 'allMediaBrowser.html', {'images': images, 'videos': videos, 'audios': audios})
+    username = request.session.get('username')
+    if username:
+        images = Media.objects.filter(username=username, type="image").values_list('path',flat=True)
+        videos = Media.objects.filter(username=username, type="video").values_list('path',flat=True)
+        audios = Media.objects.filter(username=username, type="audio").values_list('path',flat=True)
+    else:
+        images = Media.objects.filter(type="image").values_list('path',flat=True)
+        videos = Media.objects.filter(type="video").values_list('path',flat=True)
+        audios = Media.objects.filter(type="audio").values_list('path',flat=True)
+    return render(request, 'allMediaBrowser.html', {'username': username, 'images': images, 'videos': videos, 'audios': audios})
 
 
 def edit(request):
@@ -132,24 +135,13 @@ def metaUpdate(request):
     mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
     # must have '/'
     path = '/' + path
-    if mediaType == 'image':
         #use medias here
-        medias = Media.objects.filter(type='image').values_list('path',flat=True)
-        return render_to_response('singleMediaBrowser.html',{'type':mediaType,'username':request.session.get('username'),
-            'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
-    elif mediaType == 'video':
-        medias = Media.objects.filter(type='video').values_list('path',flat=True)
-        return render_to_response('singleMediaBrowser.html',{'type':mediaType,'username':request.session.get('username'),
-            'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
-    elif mediaType == 'audio':
-        medias = Media.objects.filter(type='audio').values_list('path',flat=True)
-        return render_to_response('singleMediaBrowser.html',{'type':mediaType,'username':request.session.get('username'),
-            'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
-    else:
-        pass
-    # program can not reach here
-    #return render_to_response('singleMediaBrowser.html')
-     
+    ifEdit = True
+    medias = request.session.get(mediaType)  # it is mediaType
+
+    return render_to_response('singleMediaBrowser.html',{'ifEdit':ifEdit,'type':mediaType,'username':request.session.get('username'),
+        'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
+
 
 def registerCheck(request):
     errors = []
@@ -206,7 +198,13 @@ def loginCheck(request):
                     images = Media.objects.filter(username=username, type="image").values_list('path',flat=True)
                     videos = Media.objects.filter(username=username, type="video").values_list('path',flat=True)
                     audios = Media.objects.filter(username=username, type="audio").values_list('path',flat=True)
-
+                    request.session['mediaType'] = 'personal' #then we can edit
+                    # images = Media.objects.filter(type="image").values_list('path',flat=True)
+                    # videos = Media.objects.filter(type="video").values_list('path',flat=True)
+                    # audios = Media.objects.filter(type="audio").values_list('path',flat=True)
+                    request.session['image'] = images #type is single
+                    request.session['video'] = videos
+                    request.session['audio'] = audios
                     return render(request, 'allMediaBrowser.html', {'username': username, 'images': images, 'videos': videos, 'audios': audios})
                 else:
                     errors.append('Passwords don\'t match. Try again?')
@@ -328,7 +326,7 @@ def mediaClick(request):
     ifEdit = False
     comments = ''
     
-    medias = request.session[mediaType]  # it is mediaType
+    medias = request.session.get(mediaType)  # it is mediaType
 
     if request.session.get('mediaType') == 'personal':   
         ifEdit = True
@@ -484,35 +482,28 @@ def comment(request):
     commentContent = ''
     score = 0.0
     path=''
+    update = False
+
     if request.method == 'POST':
-        if  request.POST.get('commentContent', ''):
-            commentContent = request.POST['commentContent']
         if  request.POST.get('score', ''):
             score = request.POST['score']
         if  request.POST.get('path', ''):
             path = request.POST['path']
             path = path[1:]
-
-    allComments = allComments.objects.filter(mediaPath=path).values_list('content',flat=True)
-
+        if  request.POST.get('commentContent', ''):
+            content = request.POST['commentContent']
+            content = content + '\nBy user ' + request.session.get('username')
+            t = Comment(mediaPath = path, content = content)
+            t.save()
+    t = Media.objects.get(path=path)
+    t.score = t.score + float(score)
+    t.save()
+    comments = Comment.objects.filter(mediaPath = path).values_list('content',flat=True)
     mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
     # must have '/'
     path = '/' + path
-    if mediaType == 'image':
-        #use medias here
-        medias = Media.objects.filter(type='image').values_list('path',flat=True)
-        return render_to_response('singleMediaBrowser.html',{'type':mediaType,'username':request.session.get('username'),
-            'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
-    elif mediaType == 'video':
-        medias = Media.objects.filter(type='video').values_list('path',flat=True)
-        return render_to_response('singleMediaBrowser.html',{'type':mediaType,'username':request.session.get('username'),
-            'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
-    elif mediaType == 'audio':
-        medias = Media.objects.filter(type='audio').values_list('path',flat=True)
-        return render_to_response('singleMediaBrowser.html',{'type':mediaType,'username':request.session.get('username'),
-            'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
-    else:
-        pass
+    
+    medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
+    return render_to_response('singleMediaBrowser.html',{'type':mediaType,'username':request.session.get('username'),
+        'comments':comments,'media': path, 'medias':medias})
 
-    return render_to_response('singleMediaBrowser.html',{'type':mediaType, 'username':request.session.get('username'),
-            'meta':meta, 'keyword':keyword,'media': media, 'medias':medias})

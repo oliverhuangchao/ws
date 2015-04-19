@@ -46,6 +46,7 @@ like views, models......
  DROP TABLE wei6_dghp.modelView_download; 
  DROP TABLE wei6_dghp.modelView_comment;      
  DROP TABLE wei6_dghp.modelView_media;
+ DROP TABLE wei6_dghp.modelView_download;
 
 -strict experimental !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 format transforming

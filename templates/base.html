@@ -59,6 +59,8 @@
             </form>
           </div>
 
+          {% if username %}
+
           <div class="col-md-1">
 
             <form class="navbar-form navbar-right" role="search">
@@ -80,7 +82,6 @@
                     </ol>   
           </div>
 
-          {% if username %}
           <ol class="nav navbar-nav navbar-right">
               <!--  data-target can not be "#"" -->
               <li><a data-toggle="modal" href="#" data-target="">Welcome</a></li>
