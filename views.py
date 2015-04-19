@@ -328,7 +328,7 @@ def mediaClick(request):
     if 'username' in request.session:
         #return render_to_response('test.html',{'mediaType':request.session.get('medias')})
 
-        if 'mediaType' in request.session and request.session.get('mediaType'):
+        if 'mediaTypeSession' in request.session and request.session.get('mediaTypeSession'):
             mediaTypeSession = request.session.get('mediaType')
             medias = request.session[mediaType]  # it is mediaType
             request.session['mediaTypeSession'] = ''
@@ -341,7 +341,7 @@ def mediaClick(request):
         return render_to_response('singleMediaBrowser.html',{'type':mediaType, 'username':request.session.get('username'),
             'meta':meta, 'keyword':keyword,'media': media, 'medias':medias})
     else: # all corresponding iamges
-        if 'mediaType' in request.session and request.session.get('mediaType'):
+        if 'mediaTypeSession' in request.session and request.session.get('mediaTypeSession'):
             mediaTypeSession = request.session.get('mediaType')
             medias = request.session[mediaType]  # it is mediaType
             request.session['mediaTypeSession'] = ''
