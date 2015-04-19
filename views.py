@@ -321,7 +321,7 @@ def mediaClick(request):
     meta =  Media.objects.filter(path=media).values_list('meta',flat=True)[0]
     keyword =  Media.objects.filter(path=media).values_list('keyword',flat=True)[0]
     mediaType = Media.objects.filter(path=media).values_list('type',flat=True)[0]
-
+    comments = Comment.objects.filter(mediaPath = media).values_list('content',flat=True).order_by('-commentTime')
     media = '/' + media
     medias = request.session.get(mediaType)  # it is mediaType
     if request.session.get('mediaType') == 'personal':   
@@ -349,6 +349,8 @@ def mediaDelete(request):
     mediaType = Media.objects.filter(path=media).values_list('type',flat=True)[0]
 
     Media.objects.filter(path=media).delete()
+    Comment.objects.filter(mediaPath=media).delete()
+
     os.remove(media)
 
     medias = Media.objects.filter(username=request.session.get('username'), type=mediaType).values_list('path',flat=True)
