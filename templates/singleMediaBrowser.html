@@ -17,6 +17,12 @@
           </li>
       </ol>
     </div>
+    <div class="col-md-4 col-md-offset-4">
+      {{keyword}}
+    </div>
+    <div class="col-md-4 col-md-offset-4">
+      score:{{aveScore}}
+    </div>
     {% if username and ifEdit%}
     <form class="form-imageDelete col-md-8 col-md-offset-4" action="/mediaDelete/" method="post"> 
         <input type="hidden" name="image" value={{media}}><br>
@@ -39,6 +45,12 @@
           Your browser does not support the video tag.
       </video>
     </div>
+    <div class="col-md-4 col-md-offset-4">
+      {{keyword}}
+    </div>
+    <div class="col-md-4 col-md-offset-4">
+      score:{{aveScore}}
+    </div>
 
     {% if username and ifEdit%}
     <form class="form-videoDelete col-md-8 col-md-offset-4" action="/mediaDelete/" method="post"> 
@@ -60,6 +72,13 @@
           Your browser does not support the audio element.
       </audio>
     </div>
+    <div class="col-md-4 col-md-offset-4">
+      {{keyword}}
+    </div>
+    <div class="col-md-4 col-md-offset-4">
+      score:{{aveScore}}
+    </div>
+    
     {% if username and ifEdit%}
 
     <div class="row col-md-offset-5"> 
@@ -92,12 +111,6 @@
     </div>
 
     {% else %}
-
-      {% if not ifEdit %}
-      <div class="col-md-4 col-md-offset-4">
-        {{keyword}}
-      </div>
-      {% endif%}
 
     <!-- plus from-group here to spacing -->
     <div class ="row col-md-6 col-md-offset-5 form-group">

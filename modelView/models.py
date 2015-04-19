@@ -8,10 +8,7 @@ class Account(models.Model):
 	lastname = models.CharField(max_length=50,null=True)
 	company = models.CharField(max_length=100,null=True)
 	address = models.CharField(max_length=100,null=True)
-
-
 	# email    = models.EmailField(null=True)
-
 	def __str__(self):
 		return 'username:%s password:%s' % (self.username, self.password)	
 	class Admin:
@@ -28,18 +25,34 @@ class Media(models.Model):
 	uploadTime  = models.DateTimeField(auto_now_add=True, blank=True)
 	meta 		= models.CharField(max_length=200,null=True)
 	keyword 	= models.CharField(max_length=200,null=True)
-	score		= models.FloatField(default=0.0,null=True)
+	aveScore	= models.FloatField(default=0.0,null=True)
+	numOfViewer	= models.IntegerField(default=0,null=True)
 	def __str__(self):
 		return 'name:%s type:%s' % (self.path, self.filename)	
 	class Admin:
 		pass
 class Comment(models.Model):
 	#path
-	mediaPath =  models.CharField(max_length=200,null=True)
-	username = models.CharField(max_length=50,null=True)
-	content = models.CharField(max_length=250,null=True)
+	mediaPath   =  models.CharField(max_length=200,null=True)
+	username    = models.CharField(max_length=50,null=True)
+	content 	= models.CharField(max_length=250,null=True)
 	commentTime = models.DateTimeField(auto_now_add=True, blank=True)
 	commentUser = models.CharField(max_length=50,null=True)
+	def __str__(self):
+		return 'name:%s path:%s' % (self.username, self.mediaPath)	
+	class Admin:
+		pass
+class Score(models.Model):
+	#path
+	mediaPath =  models.CharField(max_length=200,null=True)
+	username  = models.CharField(max_length=50,null=True)
+	score	  = models.FloatField(default=0.0,null=True)
+	scoreTime = models.DateTimeField(auto_now_add=True, blank=True)
+	scoreUser = models.CharField(max_length=50,null=True)
+	def __str__(self):
+		return 'name:%s path:%s' % (self.username, self.mediaPath)	
+	class Admin:
+		pass
 class Download(models.Model):
 	IP 			 = models.IPAddressField(null=True)
 	downloadTime = models.DateTimeField(auto_now_add=True,null=True)
@@ -49,24 +62,3 @@ class Download(models.Model):
 		return self.IP
 	class Admin:
 		pass
-
-# class Upload(models.Model):
-# 	IP 		   = models.IPAddressField(null=True)
-# 	uploadTime = models.DateTimeField(null=True)
-
-# 	def __str__(self):
-# 		return self.IP
-# 	class Admin:
-# 		pass
-# admin.site.unregister(Account)
-# admin.site.unregister(Media)
-# admin.site.unregister(Download)
-
-# class UploadFile(models.Model):
-# 	# title = models.CharField(max_length=30,null=True)
-# 	file = 
-# 	type 
-# 	def __str__(self):
-# 		return 'name:%s type:%s' % (self.file.name, self.file.content_type)	
-# 	class Admin:
-# 		pass

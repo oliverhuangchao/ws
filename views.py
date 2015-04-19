@@ -128,7 +128,7 @@ def metaUpdate(request):
             update = update or  (t.keyword != request.POST['keyword'])
             t.keyword = request.POST['keyword']
             t.save()
-
+    aveScore =  Media.objects.filter(path=path).values_list('aveScore',flat=True)[0]
     meta =  Media.objects.filter(path=path).values_list('meta',flat=True)[0]
     keyword =  Media.objects.filter(path=path).values_list('keyword',flat=True)[0]
     #"values" get method can alse be used
@@ -139,7 +139,7 @@ def metaUpdate(request):
     ifEdit = True
     medias = request.session.get(mediaType)  # it is mediaType
 
-    return render_to_response('singleMediaBrowser.html',{'ifEdit':ifEdit,'type':mediaType,'username':request.session.get('username'),
+    return render_to_response('singleMediaBrowser.html',{'aveScore':aveScore,'ifEdit':ifEdit,'type':mediaType,'username':request.session.get('username'),
         'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
 
 
@@ -318,6 +318,7 @@ def mediaClick(request):
             pass
     media = media[1:]
     #path can decide image uniquely
+    aveScore =  Media.objects.filter(path=media).values_list('aveScore',flat=True)[0]
     meta =  Media.objects.filter(path=media).values_list('meta',flat=True)[0]
     keyword =  Media.objects.filter(path=media).values_list('keyword',flat=True)[0]
     mediaType = Media.objects.filter(path=media).values_list('type',flat=True)[0]
@@ -327,7 +328,7 @@ def mediaClick(request):
     if request.session.get('mediaType') == 'personal':   
         ifEdit = True
     #it does not matter whether request.session.get('username') exist.
-    return render_to_response('singleMediaBrowser.html',{'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
+    return render_to_response('singleMediaBrowser.html',{'aveScore':aveScore,'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
             'meta':meta, 'keyword':keyword,'media': media, 'medias':medias})
 
 import os 
@@ -469,19 +470,30 @@ def search(request):
         # request.session['medias'] = medias
         request.session[mediaType]= medias
         return render(request, 'searchResultBrowser.html', {'username':request.session.get('username'),'type':mediaType, 'medias':medias})
+
 import time
+from django.db.models import Avg
+
 def comment(request):
     commentContent = ''
     score = 0.0
     path=''
     update = False
-
     if request.method == 'POST':
-        if  request.POST.get('score', ''):
-            score = request.POST['score']
         if  request.POST.get('path', ''):
             path = request.POST['path']
             path = path[1:]
+        if  request.POST.get('score', ''):
+            score = request.POST['score']
+            username = request.session.get('username')
+            scoreTime = time.asctime( time.localtime(time.time()) )
+            t = Score(mediaPath = path, score = score, scoreUser=username)
+            t.save()
+            t = Media.objects.get(path=path)
+            #can not use objects.get() for Score since multiple result can produce
+            t.aveScore = Score.objects.filter(mediaPath = path).aggregate(Avg('score')).values()[0]
+            t.save()
+            print t.aveScore
         if  request.POST.get('commentContent', ''):
             content = request.POST['commentContent']
             username = request.session.get('username')
@@ -490,7 +502,7 @@ def comment(request):
             t = Comment(mediaPath = path, content = content, commentUser=username)
             t.save()
     t = Media.objects.get(path=path)
-    t.score = t.score + float(score)
+    t.aveScore = t.aveScore + float(score)
     t.save()
     comments = Comment.objects.filter(mediaPath = path).values_list('content',flat=True).order_by('-commentTime')
     mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
