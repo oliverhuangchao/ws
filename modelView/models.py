@@ -58,7 +58,7 @@ class Download(models.Model):
 	IP 			 = models.IPAddressField(null=True)
 	downloadTime = models.DateTimeField(auto_now_add=True,null=True)
 	username     = models.CharField(max_length=50,null=True)
-	path = models.CharField(max_length=200,null=True)
+	path 		 = models.CharField(max_length=200,null=True)
 	def __str__(self):
 		return self.IP
 	class Admin:

@@ -36,6 +36,7 @@ delete from modelView_score where 1;
 delete from modelView_comment where 1;
 delete from modelView_media where 1;
 
+We can not delete from mysql when open python manager.py shell 
 
 
 

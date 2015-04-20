@@ -506,7 +506,6 @@ def comment(request):
         if  request.POST.get('score', ''):
             score = request.POST['score']
             username = request.session.get('username')
-            print username
             scoreTime = time.asctime( time.localtime(time.time()) )
             t = Score(mediaPath = path, score = score, scoreUser=username,username = owner)
             t.save()
@@ -514,18 +513,20 @@ def comment(request):
             #can not use objects.get() for Score since multiple result can produce
             t.aveScore = Score.objects.filter(mediaPath = path).aggregate(Avg('score')).values()[0]
             aveScore = t.aveScore
+            print aveScore
             t.save()
-            print t.aveScore
         if  request.POST.get('commentContent', ''):
             content = request.POST['commentContent']
             username = request.session.get('username')
             commentTime = time.asctime( time.localtime(time.time()) )
-            content = content + '\nBy user ' + username + ' at ' + commentTime
+            #error when username is None
+            if username:
+                content = content + '\nBy user ' + username + ' at ' + commentTime
+            else:
+                content = content + '\nBy visitor ' + ' at ' + commentTime
+
             t = Comment(mediaPath = path, content = content, commentUser=username)
             t.save()
-    t = Media.objects.get(path=path)
-    t.aveScore = t.aveScore + float(score)
-    t.save()
     comments = Comment.objects.filter(mediaPath = path).values_list('content',flat=True).order_by('-commentTime')
     mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
     numOfViewer = Media.objects.filter(path=path).values_list('numOfViewer',flat=True)[0]
