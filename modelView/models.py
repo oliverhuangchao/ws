@@ -64,3 +64,18 @@ class Download(models.Model):
 		return self.IP
 	class Admin:
 		pass
+
+class Friendlist(models.Model):
+	username     = models.CharField(max_length=50,null=True)
+	friend       = models.CharField(max_length=50,null=True)
+
+class Blacklist(models.Model):
+	username     = models.CharField(max_length=50,null=True)
+	blockedUser        = models.CharField(max_length=50,null=True)
+
+class SendMessage(models.Model):
+	sender     = models.CharField(max_length=50,null=True)
+	reciever   = models.CharField(max_length=50,null=True)
+	content    = models.CharField(max_length=250,null=True)
+	#deault: not read
+	ifRead     = models.CharField(max_length=50, default='No')

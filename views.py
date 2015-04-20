@@ -101,7 +101,7 @@ def editUpdate(request):
     firstname =  Account.objects.filter(username=request.session.get('username')).values_list('firstname',flat=True)[0]
     lastname =  Account.objects.filter(username=request.session.get('username')).values_list('lastname',flat=True)[0]
     company =  Account.objects.filter(username=request.session.get('username')).values_list('company',flat=True)[0]
-    #"values" get method can alse be used,use index
+    #"values" get method can also be used,use index
     address =  Account.objects.filter(username=request.session.get('username')).values('address')[0]['address']
 
     return render_to_response('editProfile.html',{'username':request.session.get('username'),
@@ -513,7 +513,6 @@ def comment(request):
             #can not use objects.get() for Score since multiple result can produce
             t.aveScore = Score.objects.filter(mediaPath = path).aggregate(Avg('score')).values()[0]
             aveScore = t.aveScore
-            print aveScore
             t.save()
         if  request.POST.get('commentContent', ''):
             content = request.POST['commentContent']
@@ -555,7 +554,7 @@ def download(request):
             username = Media.objects.filter(path=path).values_list('username',flat=True)[0]
     t = Download(username = username, IP = get_client_ip(request), downloadUser =request.session.get('username'), path = path)
     t.save()
-    
+
     filePath     =  path # Select your file here.
     download_name = filename
     wrapper      = FileWrapper(open(filePath))
@@ -564,3 +563,86 @@ def download(request):
     response['Content-Length']      = os.path.getsize(filePath)    
     response['Content-Disposition'] = "attachment; filename=%s"%download_name
     return response
+
+def friend(request):
+    username = request.session.get('username')
+    friendlist = Friendlist.objects.filter(username=username).values_list('friend',flat=True)
+    return render_to_response('friend.html',{'username':username, 'friendlist':friendlist})
+
+def searchFriend(request):
+    searchedFriend = ''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('query', ''):
+            searchedFriend = request.POST['query']
+    searchedFriend = Account.objects.filter(username=searchedFriend).values_list('username',flat=True)
+    # delete null error
+    if searchedFriend: 
+        searchedFriend = searchedFriend[0]
+    #prevent search himself
+    if searchedFriend == request.session.get('username'):
+        searchedFriend =''
+    friendlist = Friendlist.objects.filter(username=username).values_list('friend',flat=True)
+    return render_to_response('friend.html',{'ifSearch':True, 'searchedFriend':searchedFriend,'username':username, 'friendlist':friendlist})
+def addFriend(request):
+    searchedFriend = ''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('searchedFriend', ''):
+            searchedFriend = request.POST['searchedFriend']
+    if  searchedFriend.decode('utf8') in Friendlist.objects.filter(username=username).values_list('friend',flat=True):
+        searchedFriend = ''
+    else: 
+        t = Friendlist(username=username, friend=searchedFriend)
+        t.save()
+    
+    friendlist = Friendlist.objects.filter(username=username).values_list('friend',flat=True)
+    return render_to_response('friend.html',{'ifAdd':True,'addedUser':searchedFriend,'username':username, 'friendlist':friendlist})
+
+def sendAndDelete(request):
+    friend=''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('delete', ''):
+            friend = request.POST['friend']
+            Friendlist.objects.filter(username=username,friend=friend).delete()
+        if  request.POST.get('send', ''):
+            reciever = request.POST['friend']
+            return render_to_response('sendMessage.html',{'username':username,'reciever':reciever})
+
+    friendlist = Friendlist.objects.filter(username=username).values_list('friend',flat=True)
+    return render_to_response('friend.html',{'username':username, 'friendlist':friendlist})
+
+# In sendAndDelete, we give the reciever.
+def sendMessage(request):
+    infoContent = ''
+    reciever = ''
+    username = request.session.get('username')
+    sendTime = time.asctime( time.localtime(time.time()) )
+    if request.method == 'POST':
+        if  request.POST.get('infoContent', ''):
+            infoContent = request.POST['infoContent']
+            infoContent = infoContent + '\nBy user ' + username + ' at ' + sendTime
+        if  request.POST.get('reciever', ''):
+            reciever = request.POST['reciever']
+    if  infoContent:
+        success = 'The message has been sent successfully!'
+        t = SendMessage(sender=username, reciever=reciever,content=infoContent)
+        t.save()
+    else:
+        success = 'The message can not be empty.'
+    return render_to_response('sendMessage.html',{'success':success,'username':username,'reciever':reciever})
+
+def newMessage(request):
+    username = request.session.get('username')
+    messages = SendMessage.objects.filter(reciever=username, ifRead='No').values_list('content',flat=True)
+    return render_to_response('newMessage.html',{'username':username,'messages':messages})
+    # can not be used here, SendMessage.objects.filter(reciever=username, ifRead='No').update(ifRead='Yes')
+
+def markRead(request):
+    username = request.session.get('username')
+    SendMessage.objects.filter(reciever=username, ifRead='No').update(ifRead='Yes')
+    return render_to_response('newMessage.html',{'username':username})
+
+
+

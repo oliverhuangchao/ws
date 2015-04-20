@@ -55,6 +55,17 @@ urlpatterns = patterns('',
     (r'^comment/$', comment),
     
     (r'^download/$', download),
+    
+    (r'^friend/$', friend), #show friendlist
+    (r'^searchFriend/$', searchFriend),
+    (r'^addFriend/$', addFriend),
 
+    (r'^sendAndDelete/$', sendAndDelete),
+    (r'^sendMessage/$', sendMessage),
+    (r'^newMessage/$', newMessage),
+    (r'^markRead/$', markRead),
+
+
+    
 
 )
