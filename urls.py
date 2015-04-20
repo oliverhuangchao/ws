@@ -53,6 +53,8 @@ urlpatterns = patterns('',
     (r'^metaUpdate/$', metaUpdate),
     
     (r'^comment/$', comment),
+    
+    (r'^download/$', download),
 
 
 )

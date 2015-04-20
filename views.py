@@ -538,3 +538,29 @@ def comment(request):
     return render_to_response('singleMediaBrowser.html',{'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
         'comments':comments,'media': path, 'medias':medias})
 
+def download(request):
+    import os, tempfile, zipfile
+    from django.core.servers.basehttp import FileWrapper
+    from django.conf import settings
+    import mimetypes
+
+    filename = ''
+    username = ''
+    if request.method == 'POST':
+        if  request.POST.get('path', ''):
+            path = request.POST['path']
+            path = path[1:]
+            owner = Media.objects.filter(path=path).values_list('username',flat=True)[0]
+            filename = Media.objects.filter(path=path).values_list('filename',flat=True)[0]
+            username = Media.objects.filter(path=path).values_list('username',flat=True)[0]
+    t = Download(username = username, IP = get_client_ip(request), downloadUser =request.session.get('username'), path = path)
+    t.save()
+    
+    filePath     =  path # Select your file here.
+    download_name = filename
+    wrapper      = FileWrapper(open(filePath))
+    content_type = mimetypes.guess_type(filePath)[0]
+    response     = HttpResponse(wrapper,content_type=content_type)
+    response['Content-Length']      = os.path.getsize(filePath)    
+    response['Content-Disposition'] = "attachment; filename=%s"%download_name
+    return response
