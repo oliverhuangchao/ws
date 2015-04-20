@@ -11,4 +11,14 @@ But also metaUpdate can do that.
 
 User can not comment and score his media, he can edit his own when searching result including his.
 
-By deciding if owner and browser is the same person, we use diffenrent showing and dealing page.
+By deciding if owner and browser is the same person, we use different showing and dealing page.
+
+Care, when a image is delete, the playlist also be delete.
+
+
+things to do: delete videos in playlist
+non user 
+farivatelist(use button)
+fix bug in delete
+channel
+(whether fix the bug of the first time to log in, there is no images... in session)

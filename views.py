@@ -374,12 +374,14 @@ def mediaDelete(request):
     Media.objects.filter(path=media).delete()
     Comment.objects.filter(mediaPath=media).delete()
     Score.objects.filter(mediaPath=media).delete()
+    Playlist.objects.filter(path=media).delete()
 
     os.remove(media)
-    # We can use it when the variables is updated in time 
-        #medias = request.session.get(mediaType)  # it is mediaType
-
-    medias = Media.objects.filter(username=request.session.get('username'), type=mediaType).values_list('path',flat=True)
+    # update medias variables syncly 
+    medias = request.session.get(mediaType)  # it is mediaType
+    medias = list(medias)
+    medias.remove( media.decode('utf8'))
+    #medias = Media.objects.filter(username=request.session.get('username'), type=mediaType).values_list('path',flat=True)
     delete = "You have deleted that image successfully !"
     return render_to_response('singleMediaBrowser.html', {'type': mediaType,'username':request.session.get('username'), 'medias':medias, 'delete':delete})
 
