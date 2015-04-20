@@ -702,5 +702,22 @@ def markRead(request):
     SendMessage.objects.filter(reciever=username, ifRead='No').update(ifRead='Yes')
     return render_to_response('newMessage.html',{'username':username})
 
+def mostViewed(request):
+    request.session['mediaType'] = 'all'
+    images = Media.objects.filter(type="image").values_list('path',flat=True).order_by('-numOfViewer')[:5]
+    videos = Media.objects.filter(type="video").values_list('path',flat=True).order_by('-numOfViewer')[:5]
+    audios = Media.objects.filter(type="audio").values_list('path',flat=True).order_by('-numOfViewer')[:5]
+    request.session['image'] = images #type is single
+    request.session['video'] = videos
+    request.session['audio'] = audios
+    return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'images':images, 'videos': videos, 'audios':audios})
 
-
+def mostRecentUpload(request):
+    request.session['mediaType'] = 'all'
+    images = Media.objects.filter(type="image").values_list('path',flat=True).order_by('-uploadTime')[:5]
+    videos = Media.objects.filter(type="video").values_list('path',flat=True).order_by('-uploadTime')[:5]
+    audios = Media.objects.filter(type="audio").values_list('path',flat=True).order_by('-uploadTime')[:5]
+    request.session['image'] = images #type is single
+    request.session['video'] = videos
+    request.session['audio'] = audios
+    return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'images':images, 'videos': videos, 'audios':audios})
