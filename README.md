@@ -34,6 +34,8 @@ DROP TABLE wei6_dghp.modelView_score;
 DROP TABLE wei6_dghp.modelView_friendlist;
 DROP TABLE wei6_dghp.modelView_blocklist;
 DROP TABLE wei6_dghp.modelView_sendmessage;
+DROP TABLE wei6_dghp.modelView_playlist;
+
 
 
 delete from modelView_score where 1;

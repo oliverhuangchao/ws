@@ -337,6 +337,8 @@ def mediaClick(request):
         t = Media.objects.get(path=media)
         t.numOfViewer = t.numOfViewer + 1
         t.save()
+        t = Playlist(username=request.session.get('username'), type=mediaType, path=media)
+        t.save()
     if request.session.get('mediaType') == 'personal':   
         ifEdit = True
 
@@ -374,6 +376,8 @@ def mediaDelete(request):
     Score.objects.filter(mediaPath=media).delete()
 
     os.remove(media)
+    # We can use it when the variables is updated in time 
+        #medias = request.session.get(mediaType)  # it is mediaType
 
     medias = Media.objects.filter(username=request.session.get('username'), type=mediaType).values_list('path',flat=True)
     delete = "You have deleted that image successfully !"
@@ -537,7 +541,8 @@ def comment(request):
     # must have '/'
     path = '/' + path
     
-    medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
+    #medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
+    medias = request.session.get(mediaType)  # it is mediaType
     return render_to_response('singleMediaBrowser.html',{'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
         'comments':comments,'media': path, 'medias':medias})
 
@@ -721,3 +726,17 @@ def mostRecentUpload(request):
     request.session['video'] = videos
     request.session['audio'] = audios
     return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'images':images, 'videos': videos, 'audios':audios})
+
+def playlist(request):
+    # use all here
+    request.session['mediaType'] = 'all'
+    username = request.session.get('username')
+    images = Playlist.objects.filter(type="image",username=username).values_list('path',flat=True).order_by('-playTime')
+    videos = Playlist.objects.filter(type="video",username=username).values_list('path',flat=True).order_by('-playTime')
+    audios = Playlist.objects.filter(type="audio",username=username).values_list('path',flat=True).order_by('-playTime')
+    request.session['image'] = images #type is single
+    request.session['video'] = videos
+    request.session['audio'] = audios
+    return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'images':images, 'videos': videos, 'audios':audios})
+
+

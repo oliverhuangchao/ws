@@ -79,3 +79,10 @@ class SendMessage(models.Model):
 	content    = models.CharField(max_length=250,null=True)
 	#deault: not read
 	ifRead     = models.CharField(max_length=50, default='No')
+
+class Playlist(models.Model):
+	username   = models.CharField(max_length=50,null=True)
+	#deault: not read
+	path 	   = models.CharField(max_length=200,null=True)
+	type	   = models.CharField(max_length=250,null=True)
+	playTime   = models.DateTimeField(auto_now_add=True,null=True)

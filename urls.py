@@ -72,7 +72,10 @@ urlpatterns = patterns('',
     (r'^deleteBlockedUser/$', deleteBlockedUser),
 
     (r'^mostViewed/$', mostViewed), #show 
-    (r'^mostRecentUpload/$', mostRecentUpload), #show friendlist
+    (r'^mostRecentUpload/$', mostRecentUpload), 
+    #
+    (r'^playlist/$', playlist), 
+    
 
 
 )
