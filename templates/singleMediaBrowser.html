@@ -6,7 +6,6 @@
 
   <br>
   <div class="col-md-8">
-
     {% ifequal type 'image' %}
     {% if media %}
     <div class="col-md-offset-2">
@@ -26,7 +25,8 @@
     <div class="col-md-4 col-md-offset-4">
       view times:{{numOfViewer}}
     </div>
-    
+    {% if not ifBlock %}
+
     <div class ="row col-md-6 col-md-offset-5 form-group">
       <form method="post" action="/download/">
         <button class="btn btn-success start">
@@ -52,6 +52,8 @@
       </div>
       </form>
     </div>
+    {% endif %}
+
     
 
     {% if username and ifEdit%}
@@ -86,6 +88,7 @@
       view times:{{numOfViewer}}
     </div>
 
+    {% if not ifBlock %}
     <div class ="row col-md-6 col-md-offset-5 form-group">
       <form method="post" action="/download/">
         <button class="btn btn-success start">
@@ -111,6 +114,7 @@
       </div>
       </form>
     </div>
+    {% endif %}
 
     {% if username and ifEdit%}
     <form class="form-videoDelete col-md-8 col-md-offset-4" action="/mediaDelete/" method="post"> 
@@ -142,6 +146,7 @@
       view times:{{numOfViewer}}
     </div>
 
+    {% if not ifBlock %}
     <div class ="row col-md-6 col-md-offset-5 form-group">
       <form method="post" action="/download/">
         <button class="btn btn-success start">
@@ -167,6 +172,7 @@
       </div>
       </form>
     </div>
+    {% endif %}
 
     {% if username and ifEdit%}
 
@@ -258,7 +264,8 @@
     </form>
     {% endif %}
 
-    {% if not ifEdit%}
+    {% if not ifEdit and not ifBlock%}
+      
     <form class ="col-md-4 col-md-offset-4" method='post' action="/comment/">
           
       Comment:<br />
@@ -301,8 +308,9 @@
         </div>
       </div>
     </form>
-  {% endif%}
-  {% if comments %}
+    {% endif%}
+
+    {% if comments %}
     <div class="col-md-4 col-md-offset-4">
     <br />
     All comments:<br /><br />

@@ -110,6 +110,7 @@ def editUpdate(request):
 
 
 def metaUpdate(request):
+    # when doing meta updating, hte must edit his own media, so no blocking
     update = False
     path=''
     if request.method == 'POST':
@@ -140,7 +141,6 @@ def metaUpdate(request):
         #use medias here
     ifEdit = True
     medias = request.session.get(mediaType)  # it is mediaType
-
     return render_to_response('singleMediaBrowser.html',{'numOfViewer':numOfViewer,'aveScore':aveScore,'ifEdit':ifEdit,'type':mediaType,'username':request.session.get('username'),
         'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
 
@@ -308,6 +308,7 @@ def test(request):
 def mediaClick(request):
     media=''
     ifEdit = False
+    ifBlock = False
     comments = ''
     numOfViewer = 0
     if request.method == 'POST':
@@ -340,11 +341,14 @@ def mediaClick(request):
         ifEdit = True
 
     numOfViewer = Media.objects.filter(path=media).values_list('numOfViewer',flat=True)[0]
+    #block list
+    if request.session.get('username') in Blocklist.objects.filter(username=owner).values_list('blockedUser',flat=True):
+        ifBlock = True
 
     media = '/' + media
     medias = request.session.get(mediaType)  # it is mediaType
     #it does not matter whether request.session.get('username') exist.
-    return render_to_response('singleMediaBrowser.html',{'numOfViewer':numOfViewer,'aveScore':aveScore,'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
+    return render_to_response('singleMediaBrowser.html',{'ifBlock':ifBlock, 'numOfViewer':numOfViewer,'aveScore':aveScore,'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
             'meta':meta, 'keyword':keyword,'media': media, 'medias':medias})
 
 import os 
