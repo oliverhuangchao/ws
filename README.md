@@ -39,7 +39,6 @@ delete from modelView_media where 1;
 We can not delete from mysql when open python manager.py shell 
 
 
-
 -strict experimental !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 format transforming
 	avconv -i small.ogv  -strict experimental -vcodec libx264  small.mp4
