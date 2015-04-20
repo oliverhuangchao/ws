@@ -344,9 +344,11 @@ def mediaClick(request):
 
     numOfViewer = Media.objects.filter(path=media).values_list('numOfViewer',flat=True)[0]
     #block list
+    # block vistor
+    if not request.session.get('username') and '' in Blocklist.objects.filter(username=owner).values_list('blockedUser',flat=True):
+        ifBlock = True
     if request.session.get('username') in Blocklist.objects.filter(username=owner).values_list('blockedUser',flat=True):
         ifBlock = True
-
     media = '/' + media
     medias = request.session.get(mediaType)  # it is mediaType
     #it does not matter whether request.session.get('username') exist.
@@ -603,19 +605,22 @@ def searchFriend(request):
 
 def searchBlock(request):
     searchedBlock = ''
+    blockVistor = False
     username = request.session.get('username')
     if request.method == 'POST':
         if  request.POST.get('query', ''):
             searchedBlock = request.POST['query']
+    if not searchedBlock:
+        blockVistor = True
     searchedBlock = Account.objects.filter(username=searchedBlock).values_list('username',flat=True)
-    # delete null error
+    # add 'if' to stop null error
     if searchedBlock: 
         searchedBlock = searchedBlock[0]
     #prevent search himself
     if searchedBlock == request.session.get('username'):
         searchedBlock =''
     blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
-    return render_to_response('block.html',{'ifSearch':True, 'searchedBlock':searchedBlock,'username':username, 'blocklist':blocklist})
+    return render_to_response('block.html',{'blockVistor':blockVistor,'ifSearch':True, 'searchedBlock':searchedBlock,'username':username, 'blocklist':blocklist})
 
 def addFriend(request):
     searchedFriend = ''
@@ -645,12 +650,16 @@ def addBlock(request):
     elif  searchedBlock.decode('utf8') in Friendlist.objects.filter(username=username).values_list('friend',flat=True):
         searchedBlock = ''
     else: 
-        t = Blocklist(username=username, blockedUser=searchedBlock)
-        t.save()
-    
+        if searchedBlock =='[]':
+            #blockedUser=''
+            t = Blocklist(username=username, blockedUser='')
+            t.save()
+        else:
+            t = Blocklist(username=username, blockedUser=searchedBlock)
+            t.save()
+            print searchedBlock
     blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
     return render_to_response('block.html',{'ifAdd':True,'addedUser':searchedBlock,'username':username, 'blocklist':blocklist})
-
 
 def sendAndDelete(request):
     friend=''

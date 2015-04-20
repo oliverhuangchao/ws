@@ -13,13 +13,22 @@
             
         </form>
         {% if ifSearch %}
-            {% if searchedBlock%}
+            {% if searchedBlock or blockVistor%}
             <!-- div should be put internal, in comment, percent sign can not come up-->
-            <div class="alert alert-warning col-md-10 col-md-offfset-1"> 
-                <ul>
-                    <li>The user {{searchedBlock}} was found successfully!</li>
-                </ul>
-            </div>
+            
+                {%if searchedBlock%}
+                    <div class="alert alert-warning col-md-10 col-md-offfset-1"> 
+                        <ul>
+                            <li>The user {{searchedBlock}} was found successfully!</li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning col-md-10 col-md-offfset-1"> 
+                        <ul>
+                            <li>You are ready to block vistor!</li>
+                        </ul>
+                    </div>
+                {% endif %}
 
             <form class="navbar-form" action="/addBlock/" method="post">
                 <input class="form-control" type="hidden" name="searchedBlock" value={{searchedBlock}}>

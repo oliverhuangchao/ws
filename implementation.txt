@@ -15,6 +15,9 @@ By deciding if owner and browser is the same person, we use different showing an
 
 Care, when a image is delete, the playlist also be delete.
 
+the system can block vistor when searching nothing, then u r ready to block all visitors.
+
+The user can not come up in friend list and blocklist at the same time
 
 things to do: delete videos in playlist
 non user 
