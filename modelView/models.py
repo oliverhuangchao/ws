@@ -69,9 +69,9 @@ class Friendlist(models.Model):
 	username     = models.CharField(max_length=50,null=True)
 	friend       = models.CharField(max_length=50,null=True)
 
-class Blacklist(models.Model):
+class Blocklist(models.Model):
 	username     = models.CharField(max_length=50,null=True)
-	blockedUser        = models.CharField(max_length=50,null=True)
+	blockedUser  = models.CharField(max_length=50,null=True)
 
 class SendMessage(models.Model):
 	sender     = models.CharField(max_length=50,null=True)

@@ -65,7 +65,11 @@ urlpatterns = patterns('',
     (r'^newMessage/$', newMessage),
     (r'^markRead/$', markRead),
 
+    (r'^block/$', block), #show friendlist
+    (r'^searchBlock/$', searchBlock),
+    (r'^addBlock/$', addBlock),
 
-    
+    (r'^deleteBlockedUser/$', deleteBlockedUser), #show friendlist
+
 
 )

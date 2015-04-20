@@ -569,6 +569,11 @@ def friend(request):
     friendlist = Friendlist.objects.filter(username=username).values_list('friend',flat=True)
     return render_to_response('friend.html',{'username':username, 'friendlist':friendlist})
 
+def block(request):
+    username = request.session.get('username')
+    blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
+    return render_to_response('block.html',{'username':username, 'blocklist':blocklist})
+
 def searchFriend(request):
     searchedFriend = ''
     username = request.session.get('username')
@@ -584,6 +589,23 @@ def searchFriend(request):
         searchedFriend =''
     friendlist = Friendlist.objects.filter(username=username).values_list('friend',flat=True)
     return render_to_response('friend.html',{'ifSearch':True, 'searchedFriend':searchedFriend,'username':username, 'friendlist':friendlist})
+
+def searchBlock(request):
+    searchedBlock = ''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('query', ''):
+            searchedBlock = request.POST['query']
+    searchedBlock = Account.objects.filter(username=searchedBlock).values_list('username',flat=True)
+    # delete null error
+    if searchedBlock: 
+        searchedBlock = searchedBlock[0]
+    #prevent search himself
+    if searchedBlock == request.session.get('username'):
+        searchedBlock =''
+    blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
+    return render_to_response('block.html',{'ifSearch':True, 'searchedBlock':searchedBlock,'username':username, 'blocklist':blocklist})
+
 def addFriend(request):
     searchedFriend = ''
     username = request.session.get('username')
@@ -592,12 +614,32 @@ def addFriend(request):
             searchedFriend = request.POST['searchedFriend']
     if  searchedFriend.decode('utf8') in Friendlist.objects.filter(username=username).values_list('friend',flat=True):
         searchedFriend = ''
+    elif  searchedFriend.decode('utf8') in Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True):
+        searchedBlock = ''
     else: 
         t = Friendlist(username=username, friend=searchedFriend)
         t.save()
     
     friendlist = Friendlist.objects.filter(username=username).values_list('friend',flat=True)
     return render_to_response('friend.html',{'ifAdd':True,'addedUser':searchedFriend,'username':username, 'friendlist':friendlist})
+
+def addBlock(request):
+    searchedBlock = ''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('searchedBlock', ''):
+            searchedBlock = request.POST['searchedBlock']
+    if  searchedBlock.decode('utf8') in Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True):
+        searchedBlock = ''
+    elif  searchedBlock.decode('utf8') in Friendlist.objects.filter(username=username).values_list('friend',flat=True):
+        searchedBlock = ''
+    else: 
+        t = Blocklist(username=username, blockedUser=searchedBlock)
+        t.save()
+    
+    blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
+    return render_to_response('block.html',{'ifAdd':True,'addedUser':searchedBlock,'username':username, 'blocklist':blocklist})
+
 
 def sendAndDelete(request):
     friend=''
@@ -612,6 +654,18 @@ def sendAndDelete(request):
 
     friendlist = Friendlist.objects.filter(username=username).values_list('friend',flat=True)
     return render_to_response('friend.html',{'username':username, 'friendlist':friendlist})
+
+def deleteBlockedUser(request):
+    blockedUser=''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('delete', ''):
+            blockedUser = request.POST['blockedUser']
+            Blocklist.objects.filter(username=username,blockedUser=blockedUser).delete()
+
+    blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
+    return render_to_response('block.html',{'username':username, 'blocklist':blocklist})
+
 
 # In sendAndDelete, we give the reciever.
 def sendMessage(request):

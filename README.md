@@ -26,11 +26,15 @@ to see the update results,
 
   
                     
- DROP TABLE wei6_dghp.modelView_account;          
- DROP TABLE wei6_dghp.modelView_download; 
- DROP TABLE wei6_dghp.modelView_comment;      
- DROP TABLE wei6_dghp.modelView_media;
- DROP TABLE wei6_dghp.modelView_score;
+DROP TABLE wei6_dghp.modelView_account;          
+DROP TABLE wei6_dghp.modelView_download; 
+DROP TABLE wei6_dghp.modelView_comment;      
+DROP TABLE wei6_dghp.modelView_media;
+DROP TABLE wei6_dghp.modelView_score;
+DROP TABLE wei6_dghp.modelView_friendlist;
+DROP TABLE wei6_dghp.modelView_blocklist;
+DROP TABLE wei6_dghp.modelView_sendmessage;
+
 
 delete from modelView_score where 1;
 delete from modelView_comment where 1;
