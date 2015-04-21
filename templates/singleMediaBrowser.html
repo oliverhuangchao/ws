@@ -39,22 +39,38 @@
         <div class="form-group">
         <div class="col-md-8">
           <!-- just one kind of media -->
-          {% ifequal type 'image' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          
-          {% endifequal %}
-
-          {% ifequal type 'video' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          {% endifequal %}
-
-          {% ifequal type 'audio' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          {% endifequal %}
+          <input class="form-control" type="hidden" name="path" value={{media}}>
         </div>
       </div>
       </form>
     </div>
+    {% if not ifEdit%}
+    <div class ="row col-md-6 col-md-offset-5 form-group">
+      <form method="post" action="/subscribe/">
+        <button class="btn btn-primary start">
+            <i class="glyphicon glyphicon-ok"></i>
+          <span>Subscribe</span>
+        </button>
+        <div class="form-group">
+        <div class="col-md-8">
+          <!-- just one kind of media -->
+          <input class="form-control" type="hidden" name="path" value={{media}}>
+        </div>
+      </div>
+      </form>
+    </div>
+      {% if subscribeSuccess %}
+        <!-- div should be put internal, in comment, percent sign can not come up-->
+        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
+            <ul>
+                <li>{{subscribeSuccess}}</li>
+            </ul>
+        </div>
+      {% endif %}
+
+
+    {% endif %}
+
     {% endif %}
 
     {% if playlistDelete %}
@@ -113,22 +129,37 @@
         <div class="form-group">
         <div class="col-md-8">
           <!-- just one kind of media -->
-          {% ifequal type 'image' %}
             <input class="form-control" type="hidden" name="path" value={{media}}>
-          
-          {% endifequal %}
-
-          {% ifequal type 'video' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          {% endifequal %}
-
-          {% ifequal type 'audio' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          {% endifequal %}
         </div>
       </div>
       </form>
     </div>
+    {% if not ifEdit%}
+
+     <div class ="row col-md-6 col-md-offset-5 form-group">
+      <form method="post" action="/subscribe/">
+        <button class="btn btn-primary start">
+            <i class="glyphicon glyphicon-ok"></i>
+          <span>Subscribe</span>
+        </button>
+        <div class="form-group">
+        <div class="col-md-8">
+          <!-- just one kind of media -->
+          <input class="form-control" type="hidden" name="path" value={{media}}>
+        </div>
+      </div>
+      </form>
+    </div>
+      {% if subscribeSuccess %}
+        <!-- div should be put internal, in comment, percent sign can not come up-->
+        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
+            <ul>
+                <li>{{subscribeSuccess}}</li>
+            </ul>
+        </div>
+      {% endif %}
+
+    {% endif %}
     {% endif %}
 
     {% if playlistDelete %}
@@ -186,22 +217,37 @@
         <div class="form-group">
         <div class="col-md-8">
           <!-- just one kind of media -->
-          {% ifequal type 'image' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          
-          {% endifequal %}
-
-          {% ifequal type 'video' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          {% endifequal %}
-
-          {% ifequal type 'audio' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          {% endifequal %}
+          <input class="form-control" type="hidden" name="path" value={{media}}>
         </div>
       </div>
       </form>
     </div>
+
+    {% if not ifEdit%}
+
+     <div class ="row col-md-6 col-md-offset-5 form-group">
+      <form method="post" action="/subscribe/">
+        <button class="btn btn-primary start">
+            <i class="glyphicon glyphicon-ok"></i>
+          <span>Subscribe</span>
+        </button>
+        <div class="form-group">
+        <div class="col-md-8">
+          <!-- just one kind of media -->
+          <input class="form-control" type="hidden" name="path" value={{media}}>
+        </div>
+      </div>
+      </form>
+    </div>
+      {% if subscribeSuccess %}
+        <!-- div should be put internal, in comment, percent sign can not come up-->
+        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
+            <ul>
+                <li>{{subscribeSuccess}}</li>
+            </ul>
+        </div>
+      {% endif %}
+    {% endif %}
     {% endif %}
 
     {% if playlistDelete %}
@@ -279,18 +325,7 @@
       <div class="form-group">
         <div class="col-md-8">
           <!-- just one kind of media -->
-          {% ifequal type 'image' %}
             <input class="form-control" type="hidden" name="path" value={{media}}>
-          
-          {% endifequal %}
-
-          {% ifequal type 'video' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          {% endifequal %}
-
-          {% ifequal type 'audio' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          {% endifequal %}
         </div>
       </div>
 
@@ -334,18 +369,7 @@
       <div class="form-group">
         <div class="col-md-8">
           <!-- just one kind of media -->
-          {% ifequal type 'image' %}
             <input class="form-control" type="hidden" name="path" value={{media}}>
-          
-          {% endifequal %}
-
-          {% ifequal type 'video' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          {% endifequal %}
-
-          {% ifequal type 'audio' %}
-            <input class="form-control" type="hidden" name="path" value={{media}}>
-          {% endifequal %}
         </div>
       </div>
     </form>

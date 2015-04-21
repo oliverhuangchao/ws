@@ -783,3 +783,71 @@ def playlistDelete(request):
 
     delete = "You have deleted it from playlist successfully !"
     return render_to_response('singleMediaBrowser.html', {'type': mediaType,'username':request.session.get('username'), 'medias':medias, 'delete':delete})
+
+def subscribe(request):
+    path=''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('path', ''):
+            path = request.POST['path']
+            path = path[1:]
+    subscribedUser = Media.objects.filter(path=path).values_list('username',flat=True)[0]
+    if  subscribedUser not in Subscribe.objects.filter(username=username).values_list('subscribedUser',flat=True):
+        t = Subscribe(username=username, subscribedUser=subscribedUser)
+        t.save()
+        subscribeSuccess = 'You subscribed that user successfully!'
+    else:
+        subscribeSuccess = 'You have already subscribed that user before.'
+    aveScore =  Media.objects.filter(path=path).values_list('aveScore',flat=True)[0]
+    keyword =  Media.objects.filter(path=path).values_list('keyword',flat=True)[0]
+    comments = Comment.objects.filter(mediaPath = path).values_list('content',flat=True).order_by('-commentTime')
+    mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
+    numOfViewer = Media.objects.filter(path=path).values_list('numOfViewer',flat=True)[0]
+    uploader = Media.objects.filter(path=path).values_list('username',flat=True)[0]
+
+    # must have '/'
+    path = '/' + path
+    
+    #medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
+    medias = request.session.get(mediaType)  # it is mediaType
+    return render_to_response('singleMediaBrowser.html',{'subscribeSuccess':subscribeSuccess,'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
+        'comments':comments,'media': path, 'medias':medias})
+
+def subscribeList(request):
+    username = request.session.get('username')
+    subscribedList = Subscribe.objects.filter(username=username).values_list('subscribedUser',flat=True)
+    return render_to_response('subscribedList.html',{'username':username,'subscribedList':subscribedList})
+
+def subscribeViewAndDelete(request):
+    username = request.session.get('username')
+    subscribedUser=''
+    if request.method == 'POST':
+        if request.POST.get('view', ''):
+            subscribedUser = request.POST['subscribedUser']
+            images = Media.objects.filter(username=subscribedUser, type="image").values_list('path',flat=True)
+            videos = Media.objects.filter(username=subscribedUser, type="video").values_list('path',flat=True)
+            audios = Media.objects.filter(username=subscribedUser, type="audio").values_list('path',flat=True)
+            request.session['image'] = images #type is single
+            request.session['video'] = videos
+            request.session['audio'] = audios
+            return render(request, 'allMediaBrowser.html', {'username': username, 'images': images, 'videos': videos, 'audios': audios})
+        if  request.POST.get('delete', ''):
+            subscribedUser = request.POST['subscribedUser']
+            Subscribe.objects.filter(username=username,subscribedUser=subscribedUser).delete()
+    subscribedList = Subscribe.objects.filter(username=username).values_list('subscribedUser',flat=True)
+    return render_to_response('subscribedList.html',{'username':username, 'subscribedList':subscribedList})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

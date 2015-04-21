@@ -75,9 +75,12 @@ urlpatterns = patterns('',
     (r'^mostRecentUpload/$', mostRecentUpload), 
     #
     (r'^playlist/$', playlist), 
-        
+
     (r'^playlistDelete/$', playlistDelete), 
 
-    
+    (r'^subscribe/$', subscribe), 
+    (r'^subscribeList/$', subscribeList), 
+
+    (r'^subscribeViewAndDelete/$', subscribeViewAndDelete),
 
 )

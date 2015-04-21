@@ -86,3 +86,8 @@ class Playlist(models.Model):
 	path 	   = models.CharField(max_length=200,null=True)
 	type	   = models.CharField(max_length=250,null=True)
 	playTime   = models.DateTimeField(auto_now_add=True,null=True)
+
+class Subscribe(models.Model):
+	username   = models.CharField(max_length=50,null=True)
+	#deault: not read
+	subscribedUser = models.CharField(max_length=50,null=True)
