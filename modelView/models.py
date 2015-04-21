@@ -65,6 +65,11 @@ class Download(models.Model):
 	class Admin:
 		pass
 
+class Contactlist(models.Model):
+	username     = models.CharField(max_length=50,null=True)
+	contact      = models.CharField(max_length=50,null=True)
+	ifFriend	 = models.CharField(max_length=50,default='No')
+
 class Friendlist(models.Model):
 	username     = models.CharField(max_length=50,null=True)
 	friend       = models.CharField(max_length=50,null=True)

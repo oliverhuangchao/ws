@@ -59,7 +59,7 @@ urlpatterns = patterns('',
     (r'^friend/$', friend), #show friendlist
     (r'^searchFriend/$', searchFriend),
     (r'^addFriend/$', addFriend),
-
+    #send message
     (r'^sendAndDelete/$', sendAndDelete),
     (r'^sendMessage/$', sendMessage),
     (r'^newMessage/$', newMessage),
@@ -93,6 +93,10 @@ urlpatterns = patterns('',
     
     (r'^favoritelistDelete/$', favoritelistDelete),
 
+    (r'^contact/$', contact),
+    (r'^searchContact/$', searchContact),
+    (r'^addContact/$', addContact),
     
+    (r'^sendAndDeleteContact/$', sendAndDeleteContact),
 
 )

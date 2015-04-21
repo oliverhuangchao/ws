@@ -658,6 +658,10 @@ def addFriend(request):
     else: 
         t = Friendlist(username=username, friend=searchedFriend)
         t.save()
+        # add the friend to contactlist automatically.
+        if searchedFriend.decode('utf8') not in Contactlist.objects.filter(username=username).values_list('contact',flat=True):
+            t = Contactlist(username=username, contact=searchedFriend, ifFriend = True)
+            t.save()    
     
     friendlist = Friendlist.objects.filter(username=username).values_list('friend',flat=True)
     return render_to_response('friend.html',{'ifAdd':True,'addedUser':searchedFriend,'username':username, 'friendlist':friendlist})
@@ -966,7 +970,56 @@ def favoritelistDelete(request):
     return render_to_response('singleMediaBrowser.html', {'type': mediaType,'username':request.session.get('username'), 'medias':medias, 'delete':delete})
 
 
+def contact(request):
+    username = request.session.get('username')
+    contactlist = Contactlist.objects.filter(username=username).values_list('contact',flat=True)
+    return render_to_response('contact.html',{'username':username, 'contactlist':contactlist})
 
 
+def searchContact(request):
+    searchedContact = ''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('query', ''):
+            searchedContact = request.POST['query']
+    searchedContact = Account.objects.filter(username=searchedContact).values_list('username',flat=True)
+    # delete null error
+    if searchedContact: 
+        searchedContact = searchedContact[0]
+    #prevent search himself
+    if searchedContact == request.session.get('username'):
+        searchedContact =''
+    contactlist = Contactlist.objects.filter(username=username).values_list('contact',flat=True)
+    return render_to_response('contact.html',{'ifSearch':True, 'searchedContact':searchedContact,'username':username, 'contactlist':contactlist})
 
+def addContact(request):
+    searchedContact = ''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('searchedContact', ''):
+            searchedContact = request.POST['searchedContact']
+    if  searchedContact.decode('utf8') in Contactlist.objects.filter(username=username).values_list('contact',flat=True):
+        searchedContact = ''
+    elif  searchedContact.decode('utf8') in Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True):
+        searchedBlock = ''
+    else: 
+        t = Contactlist(username=username, contact=searchedContact)
+        t.save()
+    
+    contactlist = Contactlist.objects.filter(username=username).values_list('contact',flat=True)
+    return render_to_response('contact.html',{'ifAdd':True,'addedUser':searchedContact,'username':username, 'contactlist':contactlist})
+
+def sendAndDeleteContact(request):
+    contact=''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('delete', ''):
+            contact = request.POST['contact']
+            Contactlist.objects.filter(username=username,contact=contact).delete()
+        if  request.POST.get('send', ''):
+            reciever = request.POST['contact']
+            return render_to_response('sendMessage.html',{'username':username,'reciever':reciever})
+
+    contactlist = Contactlist.objects.filter(username=username).values_list('contact',flat=True)
+    return render_to_response('contact.html',{'username':username, 'contactlist':contactlist})
 

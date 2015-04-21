@@ -26,3 +26,5 @@ channel
 
 
 use session to transfer favorite list name.
+leaving:
+fix bug of that favorite list is null~!!!
