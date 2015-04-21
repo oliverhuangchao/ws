@@ -317,6 +317,9 @@ def mediaClick(request):
     ifEdit = False
     ifBlock = False
     playlistDelete = False
+    playlistShow = False
+    favoritelistDelete = False
+    favoritelistShow = False
     comments = ''
     numOfViewer = 0
     if request.method == 'POST':
@@ -352,7 +355,11 @@ def mediaClick(request):
         ifEdit = True
     if request.session.get('mediaType') == 'playlist':   
         playlistDelete = True
-    print playlistDelete
+        playlistShow = True
+    if request.session.get('mediaType') == 'favoritelist':   
+        favoritelistDelete = True
+        favoritelistShow = True
+    print favoritelistDelete
     numOfViewer = Media.objects.filter(path=media).values_list('numOfViewer',flat=True)[0]
     #block list
     # block vistor
@@ -364,8 +371,8 @@ def mediaClick(request):
     medias = request.session.get(mediaType)  # it is mediaType
     #it does not matter whether request.session.get('username') exist.
     favoriteList = FavoriteList.objects.filter(username=request.session.get('username')).values_list('listName',flat=True)
-
-    return render_to_response('singleMediaBrowser.html',{'favoriteList':favoriteList, 'playlistDelete':playlistDelete,'ifBlock':ifBlock, 'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
+    listName = request.session.get('favoritelistName')
+    return render_to_response('singleMediaBrowser.html',{'playlistShow':playlistShow,'favoritelistShow':favoritelistShow,'listName':listName,'favoritelistDelete':favoritelistDelete,'favoriteList':favoriteList, 'playlistDelete':playlistDelete,'ifBlock':ifBlock, 'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
             'meta':meta, 'keyword':keyword,'media': media, 'medias':medias})
 
 import os 
@@ -846,6 +853,7 @@ def subscribeViewAndDelete(request):
     return render_to_response('subscribedList.html',{'username':username, 'subscribedList':subscribedList})
 
 def favoriteList(request):
+    request.session['mediaType'] = 'favoritelist'
     username = request.session.get('username')
     favoriteList = FavoriteList.objects.filter(username=username).values_list('listName',flat=True)
     return render_to_response('favoriteList.html',{'username':username, 'favoriteList':favoriteList})
@@ -873,13 +881,15 @@ def deleteAndViewFavoriteList(request):
     if request.method == 'POST':
         if request.POST.get('view', ''):
             listName = request.POST['listName']
+            request.session['favoritelistName'] = listName
             images = FavoriteListMedia.objects.filter(username=username, listName = listName, type="image").values_list('path',flat=True)
             videos = FavoriteListMedia.objects.filter(username=username, listName = listName, type="video").values_list('path',flat=True)
             audios = FavoriteListMedia.objects.filter(username=username, listName = listName, type="audio").values_list('path',flat=True)
             request.session['image'] = images #type is single
             request.session['video'] = videos
             request.session['audio'] = audios
-            return render(request, 'allMediaBrowser.html', {'username': username, 'images': images, 'videos': videos, 'audios': audios})
+            #!!!! add listName here not the one below render_to_response
+            return render(request, 'allMediaBrowser.html', {'listName':listName,'username': username, 'images': images, 'videos': videos, 'audios': audios})
         if  request.POST.get('delete', ''):
             listName = request.POST['listName']
             FavoriteList.objects.filter(username=username,listName=listName).delete()
@@ -922,12 +932,38 @@ def saveMediaToFavoriteList(request):
     medias = request.session.get(mediaType)  # it is mediaType
     favoriteList = FavoriteList.objects.filter(username=username).values_list('listName',flat=True)
 
-    return render_to_response('singleMediaBrowser.html',{'favoriteList':favoriteList,'saveToFavoriteSuccess':saveToFavoriteSuccess,'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
+    return render_to_response('singleMediaBrowser.html',{'listName':listName,'favoriteList':favoriteList,'saveToFavoriteSuccess':saveToFavoriteSuccess,'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
         'comments':comments,'media': path, 'medias':medias})
 
+# delete one media each time
+def favoritelistDelete(request):
+    path = ''
+    listName = ''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('path', ''):
+            path = request.POST['path']
+            path = path[1:]
+        if  request.POST.get('listName', ''):
+            listName = request.POST['listName']
 
+    mediaType = FavoriteListMedia.objects.filter(path=path).values_list('type',flat=True)[0]
+    print username
+    print listName
+    print path
+    FavoriteListMedia.objects.filter(username=username, listName = listName, path=path).delete()
+    images = FavoriteListMedia.objects.filter(type="image",username=username,listName=listName).values_list('path',flat=True).distinct()
+    videos = FavoriteListMedia.objects.filter(type="video",username=username,listName=listName).values_list('path',flat=True).distinct()
+    audios = FavoriteListMedia.objects.filter(type="audio",username=username,listName=listName).values_list('path',flat=True).distinct()
 
+    request.session['image'] = images #type is single
+    request.session['video'] = videos
+    request.session['audio'] = audios
 
+    medias = request.session.get(mediaType)  # it is mediaType
+
+    delete = "You have deleted it from FavoriteList successfully !"
+    return render_to_response('singleMediaBrowser.html', {'type': mediaType,'username':request.session.get('username'), 'medias':medias, 'delete':delete})
 
 
 

@@ -90,7 +90,8 @@ urlpatterns = patterns('',
     (r'^deleteAndViewFavoriteList/$', deleteAndViewFavoriteList),
     
     (r'^saveMediaToFavoriteList/$', saveMediaToFavoriteList),
-
+    
+    (r'^favoritelistDelete/$', favoritelistDelete),
 
     
 

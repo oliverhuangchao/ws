@@ -23,3 +23,6 @@ things to do: delete videos in playlist
 farivatelist(use button)
 channel
 (whether fix the bug of the first time to log in, there is no images... in session)
+
+
+use session to transfer favorite list name.
