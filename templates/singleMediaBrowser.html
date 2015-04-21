@@ -59,6 +59,32 @@
       </div>
       </form>
     </div>
+    <div class ="row col-md-6 col-md-offset-4 form-group">
+     <form class="navbar-form" action="/saveMediaToFavoriteList/" method="post">
+
+            <div class="col-md-3">
+            <select data-live-search="true" class="btn-primary form-control input-small"  name ="listName">
+                {% for favorite in favoriteList %}
+                  <option value="{{favorite}}">{{favorite}}</option>
+                {% endfor %}
+            </select>
+            </div>
+
+            <div class="input-group-btn">
+              <button type="submit" class="btn btn-danger" name="view" value="view">save to favorite list</button>
+            </div>
+            <input type="hidden" name="path" value={{media}}><br>
+
+        </form>
+    </div>
+      {% if saveToFavoriteSuccess %}
+        <!-- div should be put internal, in comment, percent sign can not come up-->
+        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
+            <ul>
+                <li>{{saveToFavoriteSuccess}}</li>
+            </ul>
+        </div>
+      {% endif %}
       {% if subscribeSuccess %}
         <!-- div should be put internal, in comment, percent sign can not come up-->
         <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
@@ -150,6 +176,32 @@
       </div>
       </form>
     </div>
+        <div class ="row col-md-6 col-md-offset-4 form-group">
+     <form class="navbar-form" action="/saveMediaToFavoriteList/" method="post">
+
+            <div class="col-md-3">
+            <select data-live-search="true" class="btn-primary form-control input-small"  name ="listName">
+                {% for favorite in favoriteList %}
+                  <option value="{{favorite}}">{{favorite}}</option>
+                {% endfor %}
+            </select>
+            </div>
+
+            <div class="input-group-btn">
+              <button type="submit" class="btn btn-danger" name="view" value="view">save to favorite list</button>
+            </div>
+            <input type="hidden" name="path" value={{media}}><br>
+
+        </form>
+    </div>
+      {% if saveToFavoriteSuccess %}
+        <!-- div should be put internal, in comment, percent sign can not come up-->
+        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
+            <ul>
+                <li>{{saveToFavoriteSuccess}}</li>
+            </ul>
+        </div>
+      {% endif %}
       {% if subscribeSuccess %}
         <!-- div should be put internal, in comment, percent sign can not come up-->
         <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
@@ -239,6 +291,32 @@
       </div>
       </form>
     </div>
+        <div class ="row col-md-6 col-md-offset-4 form-group">
+     <form class="navbar-form" action="/saveMediaToFavoriteList/" method="post">
+
+            <div class="col-md-3">
+            <select data-live-search="true" class="btn-primary form-control input-small"  name ="listName">
+                {% for favorite in favoriteList %}
+                  <option value="{{favorite}}">{{favorite}}</option>
+                {% endfor %}
+            </select>
+            </div>
+
+            <div class="input-group-btn">
+              <button type="submit" class="btn btn-danger" name="view" value="view">save to favorite list</button>
+            </div>
+            <input type="hidden" name="path" value={{media}}><br>
+
+        </form>
+    </div>
+      {% if saveToFavoriteSuccess %}
+        <!-- div should be put internal, in comment, percent sign can not come up-->
+        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
+            <ul>
+                <li>{{saveToFavoriteSuccess}}</li>
+            </ul>
+        </div>
+      {% endif %}
       {% if subscribeSuccess %}
         <!-- div should be put internal, in comment, percent sign can not come up-->
         <div class="col-md-6 col-md-offset-4 alert alert-warning"> 

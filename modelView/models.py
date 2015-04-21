@@ -82,12 +82,21 @@ class SendMessage(models.Model):
 
 class Playlist(models.Model):
 	username   = models.CharField(max_length=50,null=True)
-	#deault: not read
 	path 	   = models.CharField(max_length=200,null=True)
 	type	   = models.CharField(max_length=250,null=True)
 	playTime   = models.DateTimeField(auto_now_add=True,null=True)
 
 class Subscribe(models.Model):
-	username   = models.CharField(max_length=50,null=True)
-	#deault: not read
+	username	   = models.CharField(max_length=50,null=True)
 	subscribedUser = models.CharField(max_length=50,null=True)
+
+class FavoriteList(models.Model):
+	username	= models.CharField(max_length=50,null=True)
+	listName 	= models.CharField(max_length=50,null=True)
+
+class FavoriteListMedia(models.Model):
+	username    = models.CharField(max_length=50,null=True)
+	listName 	= models.CharField(max_length=50,null=True)
+	# correspoding to foreign key
+	path 	    = models.CharField(max_length=200,null=True)
+	type	    = models.CharField(max_length=50,null=True)

@@ -83,4 +83,15 @@ urlpatterns = patterns('',
 
     (r'^subscribeViewAndDelete/$', subscribeViewAndDelete),
 
+    (r'^favoriteList/$', favoriteList),
+    
+    (r'^addFavoriteList/$', addFavoriteList),
+
+    (r'^deleteAndViewFavoriteList/$', deleteAndViewFavoriteList),
+    
+    (r'^saveMediaToFavoriteList/$', saveMediaToFavoriteList),
+
+
+    
+
 )

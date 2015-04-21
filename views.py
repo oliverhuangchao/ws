@@ -98,7 +98,7 @@ def editUpdate(request):
         modifyPassword = ''
         if request.POST.get('password', '') and request.POST.get('confirm_password', ''):
             if request.POST['password'] == request.POST['confirm_password']: 
-                modifyPassword = "Modify password successlly !"
+                modifyPassword = "Modify password successfully !"
                 t = Account.objects.get(username=request.session.get('username'))
                 t.password = request.POST['password']
                 t.save() 
@@ -146,7 +146,9 @@ def metaUpdate(request):
         #use medias here
     ifEdit = True
     medias = request.session.get(mediaType)  # it is mediaType
-    return render_to_response('singleMediaBrowser.html',{'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'ifEdit':ifEdit,'type':mediaType,'username':request.session.get('username'),
+    favoriteList = FavoriteList.objects.filter(username=request.session.get('username')).values_list('listName',flat=True)
+
+    return render_to_response('singleMediaBrowser.html',{'favoriteList':favoriteList,'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'ifEdit':ifEdit,'type':mediaType,'username':request.session.get('username'),
         'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
 
 
@@ -361,7 +363,9 @@ def mediaClick(request):
     media = '/' + media
     medias = request.session.get(mediaType)  # it is mediaType
     #it does not matter whether request.session.get('username') exist.
-    return render_to_response('singleMediaBrowser.html',{'playlistDelete':playlistDelete,'ifBlock':ifBlock, 'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
+    favoriteList = FavoriteList.objects.filter(username=request.session.get('username')).values_list('listName',flat=True)
+
+    return render_to_response('singleMediaBrowser.html',{'favoriteList':favoriteList, 'playlistDelete':playlistDelete,'ifBlock':ifBlock, 'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
             'meta':meta, 'keyword':keyword,'media': media, 'medias':medias})
 
 import os 
@@ -557,7 +561,9 @@ def comment(request):
     
     #medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
     medias = request.session.get(mediaType)  # it is mediaType
-    return render_to_response('singleMediaBrowser.html',{'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
+    favoriteList = FavoriteList.objects.filter(username=request.session.get('username')).values_list('listName',flat=True)
+
+    return render_to_response('singleMediaBrowser.html',{'favoriteList':favoriteList,'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
         'comments':comments,'media': path, 'medias':medias})
 
 def download(request):
@@ -810,7 +816,9 @@ def subscribe(request):
     
     #medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
     medias = request.session.get(mediaType)  # it is mediaType
-    return render_to_response('singleMediaBrowser.html',{'subscribeSuccess':subscribeSuccess,'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
+    favoriteList = FavoriteList.objects.filter(username=username).values_list('listName',flat=True)
+
+    return render_to_response('singleMediaBrowser.html',{'favoriteList':favoriteList,'subscribeSuccess':subscribeSuccess,'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
         'comments':comments,'media': path, 'medias':medias})
 
 def subscribeList(request):
@@ -837,10 +845,85 @@ def subscribeViewAndDelete(request):
     subscribedList = Subscribe.objects.filter(username=username).values_list('subscribedUser',flat=True)
     return render_to_response('subscribedList.html',{'username':username, 'subscribedList':subscribedList})
 
+def favoriteList(request):
+    username = request.session.get('username')
+    favoriteList = FavoriteList.objects.filter(username=username).values_list('listName',flat=True)
+    return render_to_response('favoriteList.html',{'username':username, 'favoriteList':favoriteList})
+def addFavoriteList(request):
+    username = request.session.get('username')
+    listName = ''
+    if request.method == 'POST':
+        if request.POST.get('listName', ''):
+            listName = request.POST['listName']
+    if not listName:
+        favoriteListSuccess = 'The favorite list can not be empty!'
+    elif  listName not in FavoriteList.objects.filter(username=username).values_list('listName',flat=True):
+        t = FavoriteList(username = username, listName = listName)
+        t.save()
+        favoriteListSuccess = 'You create the new favorite list successfully!'
+    else:
+        favoriteListSuccess = 'The favorite have already been there.'
+        
+    favoriteList = FavoriteList.objects.filter(username=username).values_list('listName',flat=True)
+    return render_to_response('favoriteList.html',{'favoriteListSuccess':favoriteListSuccess,'username':username, 'favoriteList':favoriteList})
 
+def deleteAndViewFavoriteList(request):
+    username = request.session.get('username')
+    listName=''
+    if request.method == 'POST':
+        if request.POST.get('view', ''):
+            listName = request.POST['listName']
+            images = FavoriteListMedia.objects.filter(username=username, listName = listName, type="image").values_list('path',flat=True)
+            videos = FavoriteListMedia.objects.filter(username=username, listName = listName, type="video").values_list('path',flat=True)
+            audios = FavoriteListMedia.objects.filter(username=username, listName = listName, type="audio").values_list('path',flat=True)
+            request.session['image'] = images #type is single
+            request.session['video'] = videos
+            request.session['audio'] = audios
+            return render(request, 'allMediaBrowser.html', {'username': username, 'images': images, 'videos': videos, 'audios': audios})
+        if  request.POST.get('delete', ''):
+            listName = request.POST['listName']
+            FavoriteList.objects.filter(username=username,listName=listName).delete()
+            FavoriteListMedia.objects.filter(username=username,listName=listName).delete()
+    favoriteList = FavoriteList.objects.filter(username=username).values_list('listName',flat=True)
+    return render_to_response('favoriteList.html',{'username':username, 'favoriteList':favoriteList}) 
 
+def saveMediaToFavoriteList(request):
+    username = request.session.get('username')
+    listName = ''
+    path = ''
+    saveToFavoriteSuccess = ''
+    if request.method == 'POST':
+        if  request.POST.get('path', ''):
+            path = request.POST['path']
+            path = path[1:]
+        if request.POST.get('listName', ''):
+            listName = request.POST['listName']
 
+    mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
 
+    if listName not in FavoriteListMedia.objects.filter(username=username, path=path,listName=listName).values_list('listName',flat=True):
+        saveToFavoriteSuccess = "Save the media to favorite list successfully"
+        t = FavoriteListMedia(username=username,path=path,type=mediaType,listName=listName)
+        t.save()
+    else:
+        saveToFavoriteSuccess = "The media is already in the favorite list."
+
+    aveScore =  Media.objects.filter(path=path).values_list('aveScore',flat=True)[0]
+    keyword =  Media.objects.filter(path=path).values_list('keyword',flat=True)[0]
+    comments = Comment.objects.filter(mediaPath = path).values_list('content',flat=True).order_by('-commentTime')
+    mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
+    numOfViewer = Media.objects.filter(path=path).values_list('numOfViewer',flat=True)[0]
+    uploader = Media.objects.filter(path=path).values_list('username',flat=True)[0]
+
+    # must have '/'
+    path = '/' + path
+    
+    #medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
+    medias = request.session.get(mediaType)  # it is mediaType
+    favoriteList = FavoriteList.objects.filter(username=username).values_list('listName',flat=True)
+
+    return render_to_response('singleMediaBrowser.html',{'favoriteList':favoriteList,'saveToFavoriteSuccess':saveToFavoriteSuccess,'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
+        'comments':comments,'media': path, 'medias':medias})
 
 
 

@@ -37,6 +37,10 @@ DROP TABLE wei6_dghp.modelView_blocklist;
 DROP TABLE wei6_dghp.modelView_sendmessage;
 DROP TABLE wei6_dghp.modelView_playlist;
 
+DROP TABLE wei6_dghp.modelView_favoritelist;
+DROP TABLE wei6_dghp.modelView_favoritelistmedia;
+DROP TABLE wei6_dghp.modelView_subscribe;
+
 
 
 delete from modelView_score where 1;
