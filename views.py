@@ -33,6 +33,8 @@ from django.http import HttpResponseRedirect
 from modelView.models import *
 
 def returnToMain(request):
+    #very important
+    request.session['mediaType'] = 'personal'
     username = request.session.get('username')
     if username:
         images = Media.objects.filter(username=username, type="image").values_list('path',flat=True)
@@ -42,6 +44,9 @@ def returnToMain(request):
         images = Media.objects.filter(type="image").values_list('path',flat=True)
         videos = Media.objects.filter(type="video").values_list('path',flat=True)
         audios = Media.objects.filter(type="audio").values_list('path',flat=True)
+    request.session['image'] = images #type is single
+    request.session['video'] = videos
+    request.session['audio'] = audios
     return render(request, 'allMediaBrowser.html', {'username': username, 'images': images, 'videos': videos, 'audios': audios})
 
 
@@ -135,13 +140,13 @@ def metaUpdate(request):
     #"values" get method can alse be used
     mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
     numOfViewer = Media.objects.filter(path=path).values_list('numOfViewer',flat=True)[0]
-
+    uploader = Media.objects.filter(path=path).values_list('username',flat=True)[0]
     # must have '/'
     path = '/' + path
         #use medias here
     ifEdit = True
     medias = request.session.get(mediaType)  # it is mediaType
-    return render_to_response('singleMediaBrowser.html',{'numOfViewer':numOfViewer,'aveScore':aveScore,'ifEdit':ifEdit,'type':mediaType,'username':request.session.get('username'),
+    return render_to_response('singleMediaBrowser.html',{'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'ifEdit':ifEdit,'type':mediaType,'username':request.session.get('username'),
         'meta':meta, 'keyword':keyword,'media': path, 'medias':medias})
 
 
@@ -257,7 +262,7 @@ def uploadProcess(request):
 
             new_file = Media(meta=meta, keyword=keyword, IP = get_client_ip(request), username =request.session.get('username'), path = afile, type = afile.content_type.split('/')[0], filename = afile.name)
             new_file.save()
-            imageType = ['jpg','png','bmp']
+            imageType = ['jpg','png','bmp','jpeg']
             videoType = ['flv','ogv','mp4']
             audioType = ['mp3']
             if afile.name.split(".")[1] in imageType:
@@ -309,6 +314,7 @@ def mediaClick(request):
     media=''
     ifEdit = False
     ifBlock = False
+    playlistDelete = False
     comments = ''
     numOfViewer = 0
     if request.method == 'POST':
@@ -328,7 +334,8 @@ def mediaClick(request):
     keyword =  Media.objects.filter(path=media).values_list('keyword',flat=True)[0]
     mediaType = Media.objects.filter(path=media).values_list('type',flat=True)[0]
     comments = Comment.objects.filter(mediaPath = media).values_list('content',flat=True).order_by('-commentTime')
-    
+    uploader = Media.objects.filter(path=media).values_list('username',flat=True)[0]
+
     #prevent scoring by user himself
     if request.session.get('username') == owner:
         ifEdit = True
@@ -341,7 +348,9 @@ def mediaClick(request):
         t.save()
     if request.session.get('mediaType') == 'personal':   
         ifEdit = True
-
+    if request.session.get('mediaType') == 'playlist':   
+        playlistDelete = True
+    print playlistDelete
     numOfViewer = Media.objects.filter(path=media).values_list('numOfViewer',flat=True)[0]
     #block list
     # block vistor
@@ -352,7 +361,7 @@ def mediaClick(request):
     media = '/' + media
     medias = request.session.get(mediaType)  # it is mediaType
     #it does not matter whether request.session.get('username') exist.
-    return render_to_response('singleMediaBrowser.html',{'ifBlock':ifBlock, 'numOfViewer':numOfViewer,'aveScore':aveScore,'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
+    return render_to_response('singleMediaBrowser.html',{'playlistDelete':playlistDelete,'ifBlock':ifBlock, 'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'comments':comments,'ifEdit': ifEdit,'type':mediaType, 'username':request.session.get('username'),
             'meta':meta, 'keyword':keyword,'media': media, 'medias':medias})
 
 import os 
@@ -384,7 +393,7 @@ def mediaDelete(request):
     medias = list(medias)
     medias.remove( media.decode('utf8'))
     #medias = Media.objects.filter(username=request.session.get('username'), type=mediaType).values_list('path',flat=True)
-    delete = "You have deleted that image successfully !"
+    delete = "You have deleted it successfully !"
     return render_to_response('singleMediaBrowser.html', {'type': mediaType,'username':request.session.get('username'), 'medias':medias, 'delete':delete})
 
 def allMediaBrowser(request):
@@ -541,13 +550,14 @@ def comment(request):
     comments = Comment.objects.filter(mediaPath = path).values_list('content',flat=True).order_by('-commentTime')
     mediaType = Media.objects.filter(path=path).values_list('type',flat=True)[0]
     numOfViewer = Media.objects.filter(path=path).values_list('numOfViewer',flat=True)[0]
+    uploader = Media.objects.filter(path=path).values_list('username',flat=True)[0]
 
     # must have '/'
     path = '/' + path
     
     #medias = Media.objects.filter(type=mediaType).values_list('path',flat=True)
     medias = request.session.get(mediaType)  # it is mediaType
-    return render_to_response('singleMediaBrowser.html',{'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
+    return render_to_response('singleMediaBrowser.html',{'uploader':uploader,'numOfViewer':numOfViewer,'aveScore':aveScore,'type':mediaType,'username':request.session.get('username'),
         'comments':comments,'media': path, 'medias':medias})
 
 def download(request):
@@ -649,6 +659,8 @@ def addBlock(request):
         searchedBlock = ''
     elif  searchedBlock.decode('utf8') in Friendlist.objects.filter(username=username).values_list('friend',flat=True):
         searchedBlock = ''
+    elif  '' in Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True):
+        searchedBlock = ''
     else: 
         if searchedBlock =='[]':
             #blockedUser=''
@@ -657,7 +669,6 @@ def addBlock(request):
         else:
             t = Blocklist(username=username, blockedUser=searchedBlock)
             t.save()
-            print searchedBlock
     blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
     return render_to_response('block.html',{'ifAdd':True,'addedUser':searchedBlock,'username':username, 'blocklist':blocklist})
 
@@ -739,15 +750,36 @@ def mostRecentUpload(request):
     return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'images':images, 'videos': videos, 'audios':audios})
 
 def playlist(request):
-    # use all here
-    request.session['mediaType'] = 'all'
+    # use personal here to delete in playlist
+    request.session['mediaType'] = 'playlist'
     username = request.session.get('username')
-    images = Playlist.objects.filter(type="image",username=username).values_list('path',flat=True).order_by('-playTime')
-    videos = Playlist.objects.filter(type="video",username=username).values_list('path',flat=True).order_by('-playTime')
-    audios = Playlist.objects.filter(type="audio",username=username).values_list('path',flat=True).order_by('-playTime')
+    images = Playlist.objects.filter(type="image",username=username).values_list('path',flat=True).distinct().order_by('-playTime')
+    videos = Playlist.objects.filter(type="video",username=username).values_list('path',flat=True).distinct().order_by('-playTime')
+    audios = Playlist.objects.filter(type="audio",username=username).values_list('path',flat=True).distinct().order_by('-playTime')
     request.session['image'] = images #type is single
     request.session['video'] = videos
     request.session['audio'] = audios
     return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'images':images, 'videos': videos, 'audios':audios})
+def playlistDelete(request):
+    path=''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('path', ''):
+            path = request.POST['path']
+            path = path[1:]
+    mediaType = Playlist.objects.filter(path=path).values_list('type',flat=True)[0]
+    Playlist.objects.filter(path=path).delete()
 
 
+    images = Playlist.objects.filter(type="image",username=username).values_list('path',flat=True).distinct().order_by('-playTime')
+    videos = Playlist.objects.filter(type="video",username=username).values_list('path',flat=True).distinct().order_by('-playTime')
+    audios = Playlist.objects.filter(type="audio",username=username).values_list('path',flat=True).distinct().order_by('-playTime')
+
+    request.session['image'] = images #type is single
+    request.session['video'] = videos
+    request.session['audio'] = audios
+
+    medias = request.session.get(mediaType)  # it is mediaType
+
+    delete = "You have deleted it from playlist successfully !"
+    return render_to_response('singleMediaBrowser.html', {'type': mediaType,'username':request.session.get('username'), 'medias':medias, 'delete':delete})

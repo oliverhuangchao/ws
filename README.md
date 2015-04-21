@@ -7,6 +7,7 @@ django database commands:
 	Account.objects.all()
 	Account.objects.filter(username=1)
 
+in django template, {% if var %}, if we do not give error var in html, no error was reported.
 
 Jquery and js can be used together
 JS: 

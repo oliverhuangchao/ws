@@ -20,8 +20,6 @@ the system can block vistor when searching nothing, then u r ready to block all 
 The user can not come up in friend list and blocklist at the same time
 
 things to do: delete videos in playlist
-non user 
 farivatelist(use button)
-fix bug in delete
 channel
 (whether fix the bug of the first time to log in, there is no images... in session)
