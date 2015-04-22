@@ -99,4 +99,8 @@ urlpatterns = patterns('',
     
     (r'^sendAndDeleteContact/$', sendAndDeleteContact),
 
+    (r'^searchBlockAdd/$', searchBlockAdd),
+    (r'^addBlockAdd/$', addBlockAdd),
+    (r'^deleteBlockedAddUser/$', deleteBlockedAddUser),
+
 )

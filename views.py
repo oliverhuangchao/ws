@@ -359,7 +359,6 @@ def mediaClick(request):
     if request.session.get('mediaType') == 'favoritelist':   
         favoritelistDelete = True
         favoritelistShow = True
-    print favoritelistDelete
     numOfViewer = Media.objects.filter(path=media).values_list('numOfViewer',flat=True)[0]
     #block list
     # block vistor
@@ -608,7 +607,9 @@ def friend(request):
 def block(request):
     username = request.session.get('username')
     blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
-    return render_to_response('block.html',{'username':username, 'blocklist':blocklist})
+    blocklistAdd = BlocklistAdd.objects.filter(username=username).values_list('blockedUser',flat=True)
+
+    return render_to_response('block.html',{'blocklistAdd':blocklistAdd,'username':username, 'blocklist':blocklist})
 
 def searchFriend(request):
     searchedFriend = ''
@@ -643,10 +644,13 @@ def searchBlock(request):
     if searchedBlock == request.session.get('username'):
         searchedBlock =''
     blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
-    return render_to_response('block.html',{'blockVistor':blockVistor,'ifSearch':True, 'searchedBlock':searchedBlock,'username':username, 'blocklist':blocklist})
+    blocklistAdd = BlocklistAdd.objects.filter(username=username).values_list('blockedUser',flat=True)
+
+    return render_to_response('block.html',{'blocklistAdd':blocklistAdd,'blockVistor':blockVistor,'ifSearch':True, 'searchedBlock':searchedBlock,'username':username, 'blocklist':blocklist})
 
 def addFriend(request):
     searchedFriend = ''
+    blockAddFriend = False
     username = request.session.get('username')
     if request.method == 'POST':
         if  request.POST.get('searchedFriend', ''):
@@ -655,6 +659,9 @@ def addFriend(request):
         searchedFriend = ''
     elif  searchedFriend.decode('utf8') in Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True):
         searchedBlock = ''
+    elif searchedFriend.decode('utf8') in BlocklistAdd.objects.filter(username=username).values_list('blockedUser',flat=True):
+        searchedBlock = ''
+        blockAddFriend = True
     else: 
         t = Friendlist(username=username, friend=searchedFriend)
         t.save()
@@ -662,9 +669,9 @@ def addFriend(request):
         if searchedFriend.decode('utf8') not in Contactlist.objects.filter(username=username).values_list('contact',flat=True):
             t = Contactlist(username=username, contact=searchedFriend, ifFriend = True)
             t.save()    
-    
+    print blockAddFriend
     friendlist = Friendlist.objects.filter(username=username).values_list('friend',flat=True)
-    return render_to_response('friend.html',{'ifAdd':True,'addedUser':searchedFriend,'username':username, 'friendlist':friendlist})
+    return render_to_response('friend.html',{'blockAddFriend':blockAddFriend,'ifAdd':True,'addedUser':searchedFriend,'username':username, 'friendlist':friendlist})
 
 def addBlock(request):
     searchedBlock = ''
@@ -674,8 +681,8 @@ def addBlock(request):
             searchedBlock = request.POST['searchedBlock']
     if  searchedBlock.decode('utf8') in Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True):
         searchedBlock = ''
-    elif  searchedBlock.decode('utf8') in Friendlist.objects.filter(username=username).values_list('friend',flat=True):
-        searchedBlock = ''
+    #elif  searchedBlock.decode('utf8') in Friendlist.objects.filter(username=username).values_list('friend',flat=True):
+        #searchedBlock = ''
     elif  '' in Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True):
         searchedBlock = ''
     else: 
@@ -687,7 +694,9 @@ def addBlock(request):
             t = Blocklist(username=username, blockedUser=searchedBlock)
             t.save()
     blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
-    return render_to_response('block.html',{'ifAdd':True,'addedUser':searchedBlock,'username':username, 'blocklist':blocklist})
+    blocklistAdd = BlocklistAdd.objects.filter(username=username).values_list('blockedUser',flat=True)
+
+    return render_to_response('block.html',{'blocklistAdd':blocklistAdd,'ifAdd':True,'addedUser':searchedBlock,'username':username, 'blocklist':blocklist})
 
 def sendAndDelete(request):
     friend=''
@@ -712,7 +721,9 @@ def deleteBlockedUser(request):
             Blocklist.objects.filter(username=username,blockedUser=blockedUser).delete()
 
     blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
-    return render_to_response('block.html',{'username':username, 'blocklist':blocklist})
+    blocklistAdd = BlocklistAdd.objects.filter(username=username).values_list('blockedUser',flat=True)
+
+    return render_to_response('block.html',{'blocklistAdd':blocklistAdd,'username':username, 'blocklist':blocklist})
 
 
 # In sendAndDelete, we give the reciever.
@@ -952,9 +963,6 @@ def favoritelistDelete(request):
             listName = request.POST['listName']
 
     mediaType = FavoriteListMedia.objects.filter(path=path).values_list('type',flat=True)[0]
-    print username
-    print listName
-    print path
     FavoriteListMedia.objects.filter(username=username, listName = listName, path=path).delete()
     images = FavoriteListMedia.objects.filter(type="image",username=username,listName=listName).values_list('path',flat=True).distinct()
     videos = FavoriteListMedia.objects.filter(type="video",username=username,listName=listName).values_list('path',flat=True).distinct()
@@ -1022,4 +1030,69 @@ def sendAndDeleteContact(request):
 
     contactlist = Contactlist.objects.filter(username=username).values_list('contact',flat=True)
     return render_to_response('contact.html',{'username':username, 'contactlist':contactlist})
+
+def searchBlockAdd(request):
+    searchedBlock = ''
+    blockVistor = False
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('query', ''):
+            searchedBlock = request.POST['query']
+    if not searchedBlock:
+        blockVistor = True
+    searchedBlock = Account.objects.filter(username=searchedBlock).values_list('username',flat=True)
+    # add 'if' to stop null error
+    if searchedBlock: 
+        searchedBlock = searchedBlock[0]
+    #prevent search himself
+    if searchedBlock == request.session.get('username'):
+        searchedBlock =''
+    blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
+    blocklistAdd = BlocklistAdd.objects.filter(username=username).values_list('blockedUser',flat=True)
+    
+    return render_to_response('block.html',{'blocklistAdd':blocklistAdd,'blockVistor':blockVistor,'ifSearchAdd':True, 'searchedBlock':searchedBlock,'username':username, 'blocklist':blocklist})
+
+def addBlockAdd(request):
+    searchedBlock = ''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('searchedBlock', ''):
+            searchedBlock = request.POST['searchedBlock']
+    if  searchedBlock.decode('utf8') in BlocklistAdd.objects.filter(username=username).values_list('blockedUser',flat=True):
+        searchedBlock = ''
+    # elif  '' in BlocklistAdd.objects.filter(username=username).values_list('blockedUser',flat=True):
+    #     searchedBlock = ''
+    else: 
+        if searchedBlock =='[]':
+            #blockedUser=''
+            t = BlocklistAdd(username=username, blockedUser='')
+            t.save()
+        else:
+            t = BlocklistAdd(username=username, blockedUser=searchedBlock)
+            t.save()
+    blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
+    blocklistAdd = BlocklistAdd.objects.filter(username=username).values_list('blockedUser',flat=True)
+
+    return render_to_response('block.html',{'blocklistAdd':blocklistAdd,'ifAdd':True,'addedUser':searchedBlock,'username':username, 'blocklist':blocklist})
+
+
+def deleteBlockedAddUser(request):
+    blockedUser=''
+    username = request.session.get('username')
+    if request.method == 'POST':
+        if  request.POST.get('delete', ''):
+            blockedUser = request.POST['blockedUser']
+            BlocklistAdd.objects.filter(username=username,blockedUser=blockedUser).delete()
+
+    blocklist = Blocklist.objects.filter(username=username).values_list('blockedUser',flat=True)
+    blocklistAdd = BlocklistAdd.objects.filter(username=username).values_list('blockedUser',flat=True)
+
+    return render_to_response('block.html',{'blocklistAdd':blocklistAdd,'username':username, 'blocklist':blocklist})
+
+
+
+
+
+
+
 

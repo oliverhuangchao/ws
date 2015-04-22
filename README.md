@@ -40,6 +40,9 @@ DROP TABLE wei6_dghp.modelView_playlist;
 DROP TABLE wei6_dghp.modelView_favoritelist;
 DROP TABLE wei6_dghp.modelView_favoritelistmedia;
 DROP TABLE wei6_dghp.modelView_subscribe;
+DROP TABLE wei6_dghp.modelView_blocklistadd;
+
+DROP TABLE wei6_dghp.modelView_contactlist;
 
 
 

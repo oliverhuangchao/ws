@@ -40,7 +40,7 @@
 
     </div>
     {%if ifAdd%}
-        {% if addedUser %}
+        {% if addedUser and not blockAddFriend%}
         <!-- div should be put internal, in comment, percent sign can not come up-->
             <div class="col-md-4 col-md-offset-4 alert alert-warning"> 
                 <ul>
@@ -48,11 +48,19 @@
                 </ul>
             </div>
         {% else%}
+            {% if not blockAddFriend%}
             <div class="col-md-4 col-md-offset-4 alert alert-warning"> 
                 <ul>
-                    <li>The user already in your list!</li>
+                    <li>The user has already been in your friend list!</li>
                 </ul>
             </div>
+            {% else%}
+             <div class="col-md-4 col-md-offset-4 alert alert-warning"> 
+                <ul>
+                    <li>Failed since you are his or her block list!</li>
+                </ul>
+            </div>
+            {% endif %}
         {% endif %}
     {% endif %}
 
