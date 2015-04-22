@@ -32,23 +32,17 @@ from forms import accountForm
 from django.http import HttpResponseRedirect
 from modelView.models import *
 
+
 def returnToMain(request):
     #very important
-    request.session['mediaType'] = 'personal'
-    username = request.session.get('username')
-    if username:
-        images = Media.objects.filter(username=username, type="image").values_list('path',flat=True)
-        videos = Media.objects.filter(username=username, type="video").values_list('path',flat=True)
-        audios = Media.objects.filter(username=username, type="audio").values_list('path',flat=True)
-    else:
-        images = Media.objects.filter(type="image").values_list('path',flat=True)
-        videos = Media.objects.filter(type="video").values_list('path',flat=True)
-        audios = Media.objects.filter(type="audio").values_list('path',flat=True)
+    request.session['mediaType'] = 'all'
+    images = Media.objects.filter(type="image").values_list('path',flat=True).order_by('-numOfViewer')[:5]
+    videos = Media.objects.filter(type="video").values_list('path',flat=True).order_by('-numOfViewer')[:5]
+    audios = Media.objects.filter(type="audio").values_list('path',flat=True).order_by('-numOfViewer')[:5]
     request.session['image'] = images #type is single
     request.session['video'] = videos
     request.session['audio'] = audios
-    return render(request, 'allMediaBrowser.html', {'username': username, 'images': images, 'videos': videos, 'audios': audios})
-
+    return render_to_response('allMediaBrowser.html', {'username':request.session.get('username'), 'images':images, 'videos': videos, 'audios':audios})
 
 def edit(request):
     #! just use the first 
@@ -669,7 +663,6 @@ def addFriend(request):
         if searchedFriend.decode('utf8') not in Contactlist.objects.filter(username=username).values_list('contact',flat=True):
             t = Contactlist(username=username, contact=searchedFriend, ifFriend = True)
             t.save()    
-    print blockAddFriend
     friendlist = Friendlist.objects.filter(username=username).values_list('friend',flat=True)
     return render_to_response('friend.html',{'blockAddFriend':blockAddFriend,'ifAdd':True,'addedUser':searchedFriend,'username':username, 'friendlist':friendlist})
 

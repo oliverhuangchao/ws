@@ -44,7 +44,7 @@
       </div>
       </form>
     </div>
-    {% if not ifEdit and not favoritelistShow and not playlistShow and username%}
+    {% if not ifEdit and username%}
     <div class ="row col-md-6 col-md-offset-5 form-group">
       <form method="post" action="/subscribe/">
         <button class="btn btn-primary start">
@@ -59,12 +59,20 @@
       </div>
       </form>
     </div>
+    {% if subscribeSuccess %}
+        <!-- div should be put internal, in comment, percent sign can not come up-->
+        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
+            <ul>
+                <li>{{subscribeSuccess}}</li>
+            </ul>
+        </div>
+      {% endif %}
     {% if favoriteList%}
     <div class ="row col-md-6 col-md-offset-4 form-group">
      <form class="navbar-form" action="/saveMediaToFavoriteList/" method="post">
 
-            <div class="col-md-3">
-            <select data-live-search="true" class="btn-primary form-control input-small"  name ="listName">
+            <div class="col-md-6">
+            <select data-live-search="true" class="btn-danger form-control input-small"  name ="listName">
                 {% for favorite in favoriteList %}
                   <option value="{{favorite}}">{{favorite}}</option>
                 {% endfor %}
@@ -84,14 +92,6 @@
         <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
             <ul>
                 <li>{{saveToFavoriteSuccess}}</li>
-            </ul>
-        </div>
-      {% endif %}
-      {% if subscribeSuccess %}
-        <!-- div should be put internal, in comment, percent sign can not come up-->
-        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
-            <ul>
-                <li>{{subscribeSuccess}}</li>
             </ul>
         </div>
       {% endif %}
@@ -174,7 +174,7 @@
       </div>
       </form>
     </div>
-    {% if not ifEdit and not favoritelistShow and not playlistShow%}
+    {% if not ifEdit and username%}
 
      <div class ="row col-md-6 col-md-offset-5 form-group">
       <form method="post" action="/subscribe/">
@@ -190,11 +190,20 @@
       </div>
       </form>
     </div>
+    {% if saveToFavoriteSuccess %}
+        <!-- div should be put internal, in comment, percent sign can not come up-->
+        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
+            <ul>
+                <li>{{saveToFavoriteSuccess}}</li>
+            </ul>
+        </div>
+      {% endif %}
         <div class ="row col-md-6 col-md-offset-4 form-group">
-     <form class="navbar-form" action="/saveMediaToFavoriteList/" method="post">
+        {% if favoriteList %}
+        <form class="navbar-form" action="/saveMediaToFavoriteList/" method="post">
 
-            <div class="col-md-3">
-            <select data-live-search="true" class="btn-primary form-control input-small"  name ="listName">
+            <div class="col-md-6">
+            <select data-live-search="true" class="btn-danger form-control input-small"  name ="listName">
                 {% for favorite in favoriteList %}
                   <option value="{{favorite}}">{{favorite}}</option>
                 {% endfor %}
@@ -207,15 +216,9 @@
             <input type="hidden" name="path" value={{media}}><br>
 
         </form>
+        {% endif %}
     </div>
-      {% if saveToFavoriteSuccess %}
-        <!-- div should be put internal, in comment, percent sign can not come up-->
-        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
-            <ul>
-                <li>{{saveToFavoriteSuccess}}</li>
-            </ul>
-        </div>
-      {% endif %}
+  
       {% if subscribeSuccess %}
         <!-- div should be put internal, in comment, percent sign can not come up-->
         <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
@@ -300,7 +303,7 @@
       </form>
     </div>
 
-    {% if not ifEdit and not favoritelistShow and not playlistShow%}
+    {% if not ifEdit and username%}
 
      <div class ="row col-md-6 col-md-offset-5 form-group">
       <form method="post" action="/subscribe/">
@@ -316,11 +319,22 @@
       </div>
       </form>
     </div>
+    {% if subscribeSuccess %}
+        <!-- div should be put internal, in comment, percent sign can not come up-->
+        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
+            <ul>
+                <li>{{subscribeSuccess}}</li>
+            </ul>
+        </div>
+      {% endif %}
         <div class ="row col-md-6 col-md-offset-4 form-group">
-     <form class="navbar-form" action="/saveMediaToFavoriteList/" method="post">
 
-            <div class="col-md-3">
-            <select data-live-search="true" class="btn-primary form-control input-small"  name ="listName">
+      {% if favoriteList %}
+
+        <form class="navbar-form" action="/saveMediaToFavoriteList/" method="post">
+
+            <div class="col-md-6">
+            <select data-live-search="true" class="btn-danger form-control input-small"  name ="listName">
                 {% for favorite in favoriteList %}
                   <option value="{{favorite}}">{{favorite}}</option>
                 {% endfor %}
@@ -333,6 +347,7 @@
             <input type="hidden" name="path" value={{media}}><br>
 
         </form>
+      {% endif %}
     </div>
       {% if saveToFavoriteSuccess %}
         <!-- div should be put internal, in comment, percent sign can not come up-->
@@ -342,14 +357,7 @@
             </ul>
         </div>
       {% endif %}
-      {% if subscribeSuccess %}
-        <!-- div should be put internal, in comment, percent sign can not come up-->
-        <div class="col-md-6 col-md-offset-4 alert alert-warning"> 
-            <ul>
-                <li>{{subscribeSuccess}}</li>
-            </ul>
-        </div>
-      {% endif %}
+      
     {% endif %}
     {% endif %}
 
@@ -379,8 +387,8 @@
 
     {% if username and ifEdit%}
 
-    <div class="row col-md-offset-5"> 
-      <form class="form-audioDelete col-md-1" action="/mediaDelete/" method="post"> 
+    <div class="row col-md-2 col-md-offset-5"> 
+      <form class="form-audioDelete" action="/mediaDelete/" method="post"> 
           <input type="hidden" name="audio" value={{media}}><br>
           <button type="submit" data-dz-remove class="col-md-offset-2 btn btn-danger delete">
               <i class="glyphicon glyphicon-trash"></i>
